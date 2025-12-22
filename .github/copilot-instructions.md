@@ -27,17 +27,22 @@ This document provides context and guidelines for AI agents assisting with the d
     -   **Critical**: Includes `app.on('certificate-error', ...)` to bypass SSL errors for streams with invalid certificates.
     -   Handles window creation and IPC setup.
 
-2.  **`src/components/Player.tsx`**:
+2.  **`src/App.tsx`**:
+    -   **Layout**: Manages the main application layout including the video player and sidebar.
+    -   **Drawer Logic**: Implements the auto-hiding sidebar (drawer) behavior. The sidebar appears on mouse movement and hides after 5 seconds of inactivity.
+
+3.  **`src/components/Player.tsx`**:
     -   Wraps `hls.js`.
     -   **Error Handling**: Implements custom timeouts (10s start timeout) and error overlays.
     -   **Configuration**: Uses specific `hls.js` config for timeouts (`manifestLoadingTimeOut`, etc.).
 
-3.  **`src/components/ChannelList.tsx`**:
-    -   Manages the sidebar UI.
+4.  **`src/components/ChannelList.tsx`**:
+    -   Manages the sidebar UI content.
+    -   **Styling**: Designed to be semi-transparent and overlay the video player.
     -   Handles M3U playlist imports via `fetch`.
     -   **Timeout**: Implements a 15s timeout for playlist fetching using `AbortController`.
 
-4.  **`src/utils/m3uParser.ts`**:
+5.  **`src/utils/m3uParser.ts`**:
     -   Parses raw M3U text content.
     -   Extracts `#EXTINF` metadata (tvg-name, tvg-logo, group-title).
 
@@ -62,6 +67,14 @@ The project is designed to be compatible with **Node.js v16**.
 
 ### 5. Documentation Maintenance
 -   **Update Instructions**: After completing a feature iteration or significant change, always review and update this file (`.github/copilot-instructions.md`) to reflect new architecture decisions, constraints, or patterns.
+
+### 6. Coding Standards
+-   **Readability**: Prioritize clear, self-documenting code. Use meaningful variable/function names over comments. Avoid deep nesting by using early returns.
+-   **Data Flow**: Maintain clear, unidirectional data flow (Parent -> Child). Explicitly define state ownership (e.g., `App.tsx` owns the channel list state).
+-   **Component Architecture**:
+    -   **Splitting**: Break down large components into smaller, focused sub-components with single responsibilities.
+    -   **Separation**: Keep UI rendering separate from heavy business logic or data transformation.
+-   **Semantic Programming**: Use semantic HTML elements (`<button>`, `<section>`, `<li>`) and semantic variable names to improve code understanding and accessibility.
 
 ## Common Commands
 -   `npm run dev`: Start development server (Vite + Electron).

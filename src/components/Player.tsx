@@ -101,23 +101,47 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
   }, [url]);
 
   return (
-    <div className="player-container" style={{ width: '100%', height: '100%', background: '#000', position: 'relative' }}>
+    <div
+      className="player-container"
+      style={{
+        width: '100%',
+        height: '100%',
+        background: '#000',
+        position: 'relative',
+      }}
+    >
       {error && (
-        <div style={{
-          position: 'absolute',
-          top: 0, left: 0, right: 0, bottom: 0,
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-          background: 'rgba(0,0,0,0.8)',
-          color: 'white',
-          zIndex: 10,
-          flexDirection: 'column'
-        }}>
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            background: 'rgba(0,0,0,0.8)',
+            color: 'white',
+            zIndex: 10,
+            flexDirection: 'column',
+          }}
+        >
           <h3>Playback Failed</h3>
           <p>{error}</p>
         </div>
       )}
+      {/* Overlay to capture clicks and prevent default play/pause toggle, but allow bubbling for sidebar close */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: 'calc(100% - 80px)', // Leave space for bottom controls
+          zIndex: 5,
+        }}
+      />
       <video
         ref={videoRef}
         controls
