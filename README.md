@@ -1,30 +1,82 @@
-# React + TypeScript + Vite
+# Web TV - Electron IPTV Player
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, lightweight IPTV player built with Electron, React, and TypeScript. Designed to play HLS (.m3u8) live streams with ease.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **📺 HLS Streaming**: Native support for `.m3u8` live streams using `hls.js`.
+- **📋 Playlist Management**:
+  - **Add Single Channel**: Manually add channels by Name and URL.
+  - **Bulk Import**: Import entire M3U playlists from URLs (supports `#EXTM3U` format).
+  - **Persistence**: Your channel list is automatically saved and restored (using `electron-store`).
+- **🛡️ Robust Playback**:
+  - **Error Handling**: Visual feedback for network errors or unsupported streams.
+  - **Timeout Protection**: 
+    - 10s timeout for playback start.
+    - 15s timeout for playlist imports.
+    - Configurable timeouts for HLS manifest/fragment loading.
+  - **SSL Compatibility**: Automatically bypasses SSL certificate errors to support a wider range of streams.
+- **⚡ Modern Tech Stack**: Built with Vite for lightning-fast development and build performance.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+- **Core**: [Electron](https://www.electronjs.org/)
+- **Frontend**: [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
+- **Build Tool**: [Vite](https://vitejs.dev/)
+- **Player**: [hls.js](https://github.com/video-dev/hls.js)
+- **Storage**: [electron-store](https://github.com/sindresorhus/electron-store)
 
-- Configure the top-level `parserOptions` property like this:
+## Getting Started
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+### Prerequisites
+
+- Node.js (v16 or higher recommended)
+- npm
+
+### Installation
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd web-tv
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+### Development
+
+Start the application in development mode with hot-reload:
+
+```bash
+npm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+### Build
+
+Build the application for production:
+
+```bash
+npm run build
+```
+
+## Usage
+
+1. **Add a Channel**:
+   - Enter a Name and an `.m3u8` URL in the sidebar inputs.
+   - Click "Add / Import URL".
+
+2. **Import a Playlist**:
+   - Paste a URL pointing to an `.m3u` or `.m3u8` playlist file (e.g., from GitHub).
+   - Click "Add / Import URL".
+   - The app will automatically parse and add all valid channels.
+
+3. **Play**:
+   - Click on any channel in the list to start playing.
+   - If a stream fails to start within 10 seconds, an error message will appear.
+
+## License
+
+MIT
