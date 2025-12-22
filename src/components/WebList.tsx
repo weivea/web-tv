@@ -13,6 +13,7 @@ interface WebListProps {
   onSelect: (site: WebSite) => void;
   onAdd: (site: WebSite) => void;
   onDelete: (id: string) => void;
+  onReorder: (sites: WebSite[]) => void;
 }
 
 const WebList: React.FC<WebListProps> = ({
@@ -21,10 +22,36 @@ const WebList: React.FC<WebListProps> = ({
   onSelect,
   onAdd,
   onDelete,
+  onReorder,
 }) => {
   const [newUrl, setNewUrl] = useState('');
   const [newName, setNewName] = useState('');
   const [newCssSelector, setNewCssSelector] = useState('');
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedIndex(index);
+    e.dataTransfer.effectAllowed = 'move';
+    e.dataTransfer.setData('text/plain', index.toString());
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, dropIndex: number) => {
+    e.preventDefault();
+    if (draggedIndex === null) return;
+    if (draggedIndex === dropIndex) return;
+
+    const newSites = [...sites];
+    const [draggedItem] = newSites.splice(draggedIndex, 1);
+    newSites.splice(dropIndex, 0, draggedItem);
+
+    onReorder(newSites);
+    setDraggedIndex(null);
+  };
 
   const handleAdd = () => {
     if (!newUrl) return;
@@ -78,10 +105,7 @@ const WebList: React.FC<WebListProps> = ({
             onChange={(e) => setNewCssSelector(e.target.value)}
             style={{ marginBottom: '5px' }}
           />
-          <button
-            onClick={handleAdd}
-            style={{ width: '100%' }}
-          >
+          <button onClick={handleAdd} style={{ width: '100%' }}>
             Add Website
           </button>
         </div>
@@ -91,9 +115,13 @@ const WebList: React.FC<WebListProps> = ({
         className="channel-scroll-area"
       >
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {sites.map((site) => (
+          {sites.map((site, index) => (
             <li
               key={site.id}
+              draggable
+              onDragStart={(e) => handleDragStart(e, index)}
+              onDragOver={handleDragOver}
+              onDrop={(e) => handleDrop(e, index)}
               className={`channel-item ${
                 selectedSiteId === site.id ? 'selected' : ''
               }`}

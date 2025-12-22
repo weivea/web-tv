@@ -40,7 +40,6 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
           console.error('Failed to inject CSS script', err),
         );
     };
-
     webview.addEventListener('dom-ready', injectCss);
 
     return () => {

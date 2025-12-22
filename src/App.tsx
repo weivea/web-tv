@@ -146,6 +146,11 @@ function App() {
     }
   };
 
+  const handleReorderWebSites = (newSites: Channel[]) => {
+    setWebSites(newSites);
+    window.ipcRenderer.saveWebSites(newSites);
+  };
+
   return (
     <div className="app-container" onMouseMove={handleMouseMove}>
       <div className={`sidebar-layer ${isSidebarVisible ? '' : 'hidden'}`}>
@@ -181,6 +186,7 @@ function App() {
               onSelect={setCurrentWebSite}
               onAdd={handleAddWebSite}
               onDelete={handleDeleteWebSite}
+              onReorder={handleReorderWebSites}
             />
           )}
         </div>
