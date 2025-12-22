@@ -4,6 +4,7 @@ interface Channel {
   id: string;
   name: string;
   url: string;
+  cssSelector?: string;
 }
 
 interface Window {

@@ -10,6 +10,46 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
 
   useEffect(() => {
     const webview = webviewRef.current;
+    if (!webview || !currentSite?.cssSelector) return;
+
+    const injectCss = () => {
+      const selector = JSON.stringify(currentSite.cssSelector);
+      const script = `
+        (function() {
+          const selector = ${selector};
+          const check = () => {
+            const el = document.querySelector(selector);
+            if (el) {
+              el.style.position = 'fixed';
+              el.style.zIndex = '10400';
+              el.style.left = '0';
+              el.style.top = '0';
+              el.style.width = '100%';
+              el.style.height = '100%';
+              el.style.background = '#000';
+            } else {
+              setTimeout(check, 200);
+            }
+          };
+          check();
+        })();
+      `;
+      webview
+        .executeJavaScript(script)
+        .catch((err: unknown) =>
+          console.error('Failed to inject CSS script', err),
+        );
+    };
+
+    webview.addEventListener('dom-ready', injectCss);
+
+    return () => {
+      webview.removeEventListener('dom-ready', injectCss);
+    };
+  }, [currentSite]);
+
+  useEffect(() => {
+    const webview = webviewRef.current;
     if (!webview) return;
 
     if (!isActive) {

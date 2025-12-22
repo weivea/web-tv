@@ -9,6 +9,7 @@ interface Channel {
   id: string;
   name: string;
   url: string;
+  cssSelector?: string;
 }
 
 type Tab = 'iptv' | 'webtv';

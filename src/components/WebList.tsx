@@ -4,6 +4,7 @@ interface WebSite {
   id: string;
   name: string;
   url: string;
+  cssSelector?: string;
 }
 
 interface WebListProps {
@@ -23,6 +24,7 @@ const WebList: React.FC<WebListProps> = ({
 }) => {
   const [newUrl, setNewUrl] = useState('');
   const [newName, setNewName] = useState('');
+  const [newCssSelector, setNewCssSelector] = useState('');
 
   const handleAdd = () => {
     if (!newUrl) return;
@@ -32,9 +34,11 @@ const WebList: React.FC<WebListProps> = ({
         id: Date.now().toString(),
         name: newName,
         url: newUrl,
+        cssSelector: newCssSelector,
       });
       setNewName('');
       setNewUrl('');
+      setNewCssSelector('');
     } else {
       alert('Please provide a name for the website');
     }
@@ -65,6 +69,13 @@ const WebList: React.FC<WebListProps> = ({
             placeholder="URL (https://...)"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
+            style={{ marginBottom: '5px' }}
+          />
+          <input
+            type="text"
+            placeholder="Full Screen CSS Selector (Optional)"
+            value={newCssSelector}
+            onChange={(e) => setNewCssSelector(e.target.value)}
             style={{ marginBottom: '5px' }}
           />
           <button
