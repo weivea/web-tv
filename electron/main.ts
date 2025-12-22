@@ -56,6 +56,23 @@ ipcMain.handle('save-web-sites', (_event, sites) => {
   store.set('webSites', sites);
 });
 
+ipcMain.handle('get-last-state', () => {
+  return {
+    lastChannelId: store.get('lastChannelId'),
+    lastWebSiteId: store.get('lastWebSiteId'),
+    lastActiveTab: store.get('lastActiveTab', 'iptv'),
+  };
+});
+
+ipcMain.handle('save-last-state', (_event, state) => {
+  if (state.lastChannelId !== undefined)
+    store.set('lastChannelId', state.lastChannelId);
+  if (state.lastWebSiteId !== undefined)
+    store.set('lastWebSiteId', state.lastWebSiteId);
+  if (state.lastActiveTab !== undefined)
+    store.set('lastActiveTab', state.lastActiveTab);
+});
+
 let win: BrowserWindow | null;
 
 function createWindow() {

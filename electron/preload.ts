@@ -27,4 +27,6 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
     ipcRenderer.invoke('save-channels', channels),
   getWebSites: () => ipcRenderer.invoke('get-web-sites'),
   saveWebSites: (sites: any) => ipcRenderer.invoke('save-web-sites', sites),
+  getLastState: () => ipcRenderer.invoke('get-last-state'),
+  saveLastState: (state: any) => ipcRenderer.invoke('save-last-state', state),
 });

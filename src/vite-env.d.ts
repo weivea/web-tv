@@ -12,5 +12,15 @@ interface Window {
     saveChannels: (channels: Channel[]) => Promise<void>;
     getWebSites: () => Promise<Channel[]>;
     saveWebSites: (sites: Channel[]) => Promise<void>;
+    getLastState: () => Promise<{
+      lastChannelId?: string;
+      lastWebSiteId?: string;
+      lastActiveTab?: 'iptv' | 'webtv';
+    }>;
+    saveLastState: (state: {
+      lastChannelId?: string;
+      lastWebSiteId?: string;
+      lastActiveTab?: 'iptv' | 'webtv';
+    }) => Promise<void>;
   };
 }

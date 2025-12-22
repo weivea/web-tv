@@ -24,29 +24,56 @@ function App() {
   const [currentWebSite, setCurrentWebSite] = useState<Channel | null>(null);
 
   const [isSidebarVisible, setSidebarVisible] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    // Load channels from store
-    window.ipcRenderer.getChannels().then((savedChannels) => {
+    const loadData = async () => {
+      const [savedChannels, savedSites, lastState] = await Promise.all([
+        window.ipcRenderer.getChannels(),
+        window.ipcRenderer.getWebSites(),
+        window.ipcRenderer.getLastState(),
+      ]);
+
       if (savedChannels && Array.isArray(savedChannels)) {
         setChannels(savedChannels);
         if (savedChannels.length > 0) {
-          setCurrentChannel(savedChannels[0]);
+          const lastChannel = savedChannels.find(
+            (c) => c.id === lastState.lastChannelId,
+          );
+          setCurrentChannel(lastChannel || savedChannels[0]);
         }
       }
-    });
 
-    // Load web sites from store
-    window.ipcRenderer.getWebSites().then((savedSites) => {
       if (savedSites && Array.isArray(savedSites)) {
         setWebSites(savedSites);
         if (savedSites.length > 0) {
-          setCurrentWebSite(savedSites[0]);
+          const lastSite = savedSites.find(
+            (s) => s.id === lastState.lastWebSiteId,
+          );
+          setCurrentWebSite(lastSite || savedSites[0]);
         }
       }
-    });
+
+      if (lastState.lastActiveTab) {
+        setActiveTab(lastState.lastActiveTab);
+      }
+
+      setIsLoaded(true);
+    };
+
+    loadData();
   }, []);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+
+    window.ipcRenderer.saveLastState({
+      lastChannelId: currentChannel?.id,
+      lastWebSiteId: currentWebSite?.id,
+      lastActiveTab: activeTab,
+    });
+  }, [currentChannel, currentWebSite, activeTab, isLoaded]);
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
@@ -182,15 +209,6 @@ function App() {
       </div>
     </div>
   );
-}
-
-// Add type definition for webview to avoid TS errors
-declare global {
-  namespace JSX {
-    interface IntrinsicElements {
-      webview: any;
-    }
-  }
 }
 
 export default App;
