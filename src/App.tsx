@@ -3,6 +3,7 @@ import './App.css';
 import Player from './components/Player';
 import ChannelList from './components/ChannelList';
 import WebList from './components/WebList';
+import WebTV from './components/web-tv';
 
 interface Channel {
   id: string;
@@ -185,27 +186,16 @@ function App() {
       </div>
 
       <div className="player-layer" onClick={() => setSidebarVisible(false)}>
-        {activeTab === 'iptv' ? (
-          currentChannel ? (
+        {activeTab === 'iptv' &&
+          (currentChannel ? (
             <Player url={currentChannel.url} />
           ) : (
             <div className="placeholder-text">
               Select or add a channel to play
             </div>
-          )
-        ) : currentWebSite ? (
-          <>
-            <webview
-              src={currentWebSite.url}
-              style={{ width: '100%', height: '100%' }}
-            />
-            <div className="webview-overlay" />
-          </>
-        ) : (
-          <div className="placeholder-text">
-            Select or add a website to view
-          </div>
-        )}
+          ))}
+
+        <WebTV isActive={activeTab === 'webtv'} currentSite={currentWebSite} />
       </div>
     </div>
   );
