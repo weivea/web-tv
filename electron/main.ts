@@ -48,26 +48,35 @@ ipcMain.handle('save-channels', (_event, channels) => {
   store.set('channels', channels)
 })
 
-let win: BrowserWindow | null
+ipcMain.handle('get-web-sites', () => {
+  return store.get('webSites', []);
+});
+
+ipcMain.handle('save-web-sites', (_event, sites) => {
+  store.set('webSites', sites);
+});
+
+let win: BrowserWindow | null;
 
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      webviewTag: true,
     },
-  })
+  });
 
   // Test active push message to Renderer-process.
   win.webContents.on('did-finish-load', () => {
-    win?.webContents.send('main-process-message', (new Date).toLocaleString())
-  })
+    win?.webContents.send('main-process-message', new Date().toLocaleString());
+  });
 
   if (VITE_DEV_SERVER_URL) {
-    win.loadURL(VITE_DEV_SERVER_URL)
+    win.loadURL(VITE_DEV_SERVER_URL);
   } else {
     // win.loadFile('dist/index.html')
-    win.loadFile(path.join(RENDERER_DIST, 'index.html'))
+    win.loadFile(path.join(RENDERER_DIST, 'index.html'));
   }
 }
 

@@ -3,13 +3,16 @@
 This document provides context and guidelines for AI agents assisting with the development of this project.
 
 ## Project Overview
-**Web TV** is a desktop IPTV player application built with Electron, React, and TypeScript. It focuses on playing HLS (`.m3u8`) streams and managing M3U playlists.
+**Web TV** is a desktop application built with Electron, React, and TypeScript. It features two main modes:
+1.  **IPTV Player**: Plays HLS (`.m3u8`) streams and manages M3U playlists.
+2.  **Web TV**: Browses user-configured websites using an embedded browser view.
 
 ## Tech Stack & Constraints
 - **Runtime**: Electron (Main process)
 - **Frontend**: React 18 + TypeScript
 - **Build Tool**: Vite 4.x (Note: Kept at v4 for Node 16 compatibility)
 - **Video Player**: `hls.js`
+- **Web View**: Electron `webview` tag (enabled in main process)
 - **State/Persistence**: `electron-store` (v8.1.0 - strictly kept at this version for CommonJS/Node 16 compatibility)
 - **Icons**: `lucide-react`
 
@@ -18,31 +21,34 @@ This document provides context and guidelines for AI agents assisting with the d
 ### Directory Structure
 - `electron/`: Contains the Main process code (`main.ts`) and Preload scripts (`preload.ts`).
 - `src/`: React Renderer process code.
-  - `components/`: UI components (`Player.tsx`, `ChannelList.tsx`).
+  - `components/`: UI components (`Player.tsx`, `ChannelList.tsx`, `WebList.tsx`).
   - `utils/`: Helper functions (`m3uParser.ts`).
 
 ### Key Components
 1.  **`electron/main.ts`**:
     -   Entry point.
-    -   **Critical**: Includes `app.on('certificate-error', ...)` to bypass SSL errors for streams with invalid certificates.
-    -   Handles window creation and IPC setup.
+    -   **Critical**: Includes `app.on('certificate-error', ...)` to bypass SSL errors.
+    -   **Configuration**: Enables `webviewTag: true` in `webPreferences` to support the Web TV feature.
+    -   Handles window creation and IPC setup for both Channels and Web Sites.
 
 2.  **`src/App.tsx`**:
-    -   **Layout**: Manages the main application layout including the video player and sidebar.
-    -   **Drawer Logic**: Implements the auto-hiding sidebar (drawer) behavior. The sidebar appears on mouse movement and hides after 5 seconds of inactivity.
+    -   **Layout**: Manages the main application layout including the sidebar and main content area.
+    -   **State**: Manages `activeTab` ('iptv' | 'webtv'), `channels`, and `webSites`.
+    -   **Drawer Logic**: Implements the auto-hiding sidebar (drawer) behavior.
 
 3.  **`src/components/Player.tsx`**:
-    -   Wraps `hls.js`.
-    -   **Error Handling**: Implements custom timeouts (10s start timeout) and error overlays.
-    -   **Configuration**: Uses specific `hls.js` config for timeouts (`manifestLoadingTimeOut`, etc.).
+    -   Wraps `hls.js` for IPTV playback.
+    -   **Error Handling**: Implements custom timeouts and error overlays.
 
 4.  **`src/components/ChannelList.tsx`**:
-    -   Manages the sidebar UI content.
-    -   **Styling**: Designed to be semi-transparent and overlay the video player.
-    -   Handles M3U playlist imports via `fetch`.
-    -   **Timeout**: Implements a 15s timeout for playlist fetching using `AbortController`.
+    -   Manages the sidebar UI for IPTV channels.
+    -   Handles M3U playlist imports.
 
-5.  **`src/utils/m3uParser.ts`**:
+5.  **`src/components/WebList.tsx`**:
+    -   Manages the sidebar UI for Web TV sites.
+    -   Allows adding/removing websites (Title + URL).
+
+6.  **`src/utils/m3uParser.ts`**:
     -   Parses raw M3U text content.
     -   Extracts `#EXTINF` metadata (tvg-name, tvg-logo, group-title).
 

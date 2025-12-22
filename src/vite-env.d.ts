@@ -10,5 +10,7 @@ interface Window {
   ipcRenderer: import('electron').IpcRenderer & {
     getChannels: () => Promise<Channel[]>;
     saveChannels: (channels: Channel[]) => Promise<void>;
-  }
+    getWebSites: () => Promise<Channel[]>;
+    saveWebSites: (sites: Channel[]) => Promise<void>;
+  };
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import './App.css';
 import Player from './components/Player';
 import ChannelList from './components/ChannelList';
+import WebList from './components/WebList';
 
 interface Channel {
   id: string;
@@ -9,9 +10,19 @@ interface Channel {
   url: string;
 }
 
+type Tab = 'iptv' | 'webtv';
+
 function App() {
+  const [activeTab, setActiveTab] = useState<Tab>('iptv');
+
+  // IPTV State
   const [channels, setChannels] = useState<Channel[]>([]);
   const [currentChannel, setCurrentChannel] = useState<Channel | null>(null);
+
+  // Web TV State
+  const [webSites, setWebSites] = useState<Channel[]>([]);
+  const [currentWebSite, setCurrentWebSite] = useState<Channel | null>(null);
+
   const [isSidebarVisible, setSidebarVisible] = useState(false);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -22,6 +33,16 @@ function App() {
         setChannels(savedChannels);
         if (savedChannels.length > 0) {
           setCurrentChannel(savedChannels[0]);
+        }
+      }
+    });
+
+    // Load web sites from store
+    window.ipcRenderer.getWebSites().then((savedSites) => {
+      if (savedSites && Array.isArray(savedSites)) {
+        setWebSites(savedSites);
+        if (savedSites.length > 0) {
+          setCurrentWebSite(savedSites[0]);
         }
       }
     });
@@ -49,6 +70,7 @@ function App() {
     [isSidebarVisible],
   );
 
+  // Channel Handlers
   const handleAddChannel = (channel: Channel) => {
     const newChannels = [...channels, channel];
     setChannels(newChannels);
@@ -76,37 +98,99 @@ function App() {
     }
   };
 
+  // Web Site Handlers
+  const handleAddWebSite = (site: Channel) => {
+    const newSites = [...webSites, site];
+    setWebSites(newSites);
+    window.ipcRenderer.saveWebSites(newSites);
+    if (!currentWebSite) {
+      setCurrentWebSite(site);
+    }
+  };
+
+  const handleDeleteWebSite = (id: string) => {
+    const newSites = webSites.filter((s) => s.id !== id);
+    setWebSites(newSites);
+    window.ipcRenderer.saveWebSites(newSites);
+    if (currentWebSite?.id === id) {
+      setCurrentWebSite(newSites.length > 0 ? newSites[0] : null);
+    }
+  };
+
   return (
     <div className="app-container" onMouseMove={handleMouseMove}>
       <div className={`sidebar-layer ${isSidebarVisible ? '' : 'hidden'}`}>
-        <ChannelList
-          channels={channels}
-          selectedChannelId={currentChannel?.id}
-          onSelect={setCurrentChannel}
-          onAdd={handleAddChannel}
-          onImport={handleImportChannels}
-          onDelete={handleDeleteChannel}
-        />
-      </div>
-      <div className="player-layer" onClick={() => setSidebarVisible(false)}>
-        {currentChannel ? (
-          <Player url={currentChannel.url} />
-        ) : (
-          <div
-            style={{
-              color: 'white',
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: '100%',
-            }}
+        <div className="sidebar-tabs">
+          <button
+            className={`tab-btn ${activeTab === 'iptv' ? 'active' : ''}`}
+            onClick={() => setActiveTab('iptv')}
           >
-            Select or add a channel to play
+            IPTV
+          </button>
+          <button
+            className={`tab-btn ${activeTab === 'webtv' ? 'active' : ''}`}
+            onClick={() => setActiveTab('webtv')}
+          >
+            Web TV
+          </button>
+        </div>
+
+        <div className="sidebar-content">
+          {activeTab === 'iptv' ? (
+            <ChannelList
+              channels={channels}
+              selectedChannelId={currentChannel?.id}
+              onSelect={setCurrentChannel}
+              onAdd={handleAddChannel}
+              onImport={handleImportChannels}
+              onDelete={handleDeleteChannel}
+            />
+          ) : (
+            <WebList
+              sites={webSites}
+              selectedSiteId={currentWebSite?.id}
+              onSelect={setCurrentWebSite}
+              onAdd={handleAddWebSite}
+              onDelete={handleDeleteWebSite}
+            />
+          )}
+        </div>
+      </div>
+
+      <div className="player-layer" onClick={() => setSidebarVisible(false)}>
+        {activeTab === 'iptv' ? (
+          currentChannel ? (
+            <Player url={currentChannel.url} />
+          ) : (
+            <div className="placeholder-text">
+              Select or add a channel to play
+            </div>
+          )
+        ) : currentWebSite ? (
+          <>
+            <webview
+              src={currentWebSite.url}
+              style={{ width: '100%', height: '100%' }}
+            />
+            <div className="webview-overlay" />
+          </>
+        ) : (
+          <div className="placeholder-text">
+            Select or add a website to view
           </div>
         )}
       </div>
     </div>
   );
+}
+
+// Add type definition for webview to avoid TS errors
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      webview: any;
+    }
+  }
 }
 
 export default App;

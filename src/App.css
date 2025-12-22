@@ -41,7 +41,7 @@ body {
 }
 
 .sidebar-layer.hidden {
-  transform: translateX(-100%);
+  transform: translateX(-120%);
 }
 
 /* Styling for ChannelList content to match dark theme */
@@ -131,3 +131,58 @@ body {
   color: white;
   border-color: transparent;
 }
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  padding: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+}
+
+.tab-btn:hover {
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.tab-btn.active {
+  color: #4a9eff;
+  border-bottom: 2px solid #4a9eff;
+  background: rgba(74, 158, 255, 0.1);
+}
+
+.sidebar-content {
+  height: calc(100% - 45px); /* Adjust based on tab height */
+  overflow: hidden;
+}
+
+.placeholder-text {
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 1.2em;
+  opacity: 0.7;
+}
+
+
+.webview-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5;
+  background: transparent;
+}
+
