@@ -122,6 +122,7 @@ function createWindow() {
   win = new BrowserWindow({
     icon: getIconPath(),
     frame: false, // Frameless window
+    fullscreen: true,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
