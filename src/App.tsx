@@ -144,7 +144,10 @@ function App() {
           setSidebarVisible(false);
         }, 5000);
       } else {
-        if (e.clientX < window.innerWidth / 4) {
+        if (
+          e.clientX < window.innerWidth / 4 &&
+          e.clientY < (window.innerHeight * 2) / 3
+        ) {
           setSidebarVisible(true);
           timeoutRef.current = setTimeout(() => {
             setSidebarVisible(false);

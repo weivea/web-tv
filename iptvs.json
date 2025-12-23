@@ -74,5 +74,13 @@
   {
     "name": "台湾频道",
     "url": "https://live.hacks.tools/tv/ipv4/categories/taiwan.m3u"
+  },
+  {
+    "name": "中文国际",
+    "url": "https://live.hacks.tools/iptv/languages/zho.m3u"
+  },
+  {
+    "name": "英语台",
+    "url": "https://live.hacks.tools/iptv/languages/eng.m3u"
   }
 ]

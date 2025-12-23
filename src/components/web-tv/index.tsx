@@ -33,11 +33,7 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
     } else {
       try {
         webview.setAudioMuted(false);
-        webview
-          .executeJavaScript(
-            `document.querySelectorAll('video, audio').forEach(el => el.play());`,
-          )
-          .catch(() => {});
+        webview.executeJavaScript(`location.reload();`).catch(() => {});
       } catch (e) {
         console.error('Failed to unmute webview', e);
       }
