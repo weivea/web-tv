@@ -12,6 +12,7 @@
     "electron-store": "^8.1.0",
     "hls.js": "^1.6.15",
     "lucide-react": "^0.562.0",
+    "mpegts.js": "^1.8.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

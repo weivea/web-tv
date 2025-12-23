@@ -11,7 +11,7 @@ This document provides context and guidelines for AI agents assisting with the d
 - **Runtime**: Electron (Main process)
 - **Frontend**: React 18 + TypeScript
 - **Build Tool**: Vite 4.x (Note: Kept at v4 for Node 16 compatibility)
-- **Video Player**: `hls.js`
+- **Video Player**: `hls.js` (HLS), `mpegts.js` (FLV)
 - **Web View**: Electron `webview` tag (enabled in main process)
 - **State/Persistence**: `electron-store` (v8.1.0 - strictly kept at this version for CommonJS/Node 16 compatibility)
 - **Icons**: `lucide-react`
@@ -43,6 +43,8 @@ This document provides context and guidelines for AI agents assisting with the d
         -   `currentPlaylist`: Currently selected playlist.
         -   `playlistChannels`: Channels within the current playlist.
         -   `webSites`: List of Web TV sites.
+    -   **Persistence**: Implements logic to restore the last played channel and playlist on startup using stable IDs (based on URL).
+    -   **Behavior**: Supports seamless playback when switching playlists (current channel continues playing until a new one is selected).
     -   **Drawer Logic**: Implements the auto-hiding sidebar (drawer) behavior.
 
 3.  **`src/components/TitleBar.tsx`**:
@@ -51,8 +53,9 @@ This document provides context and guidelines for AI agents assisting with the d
     -   **Behavior**: Auto-hides (opacity 0) and reveals on hover.
 
 4.  **`src/components/Player.tsx`**:
-    -   Wraps `hls.js` for IPTV playback.
-    -   **Error Handling**: Implements custom timeouts and error overlays.
+    -   **Playback Engine**: Wraps `hls.js` for HLS streams and `mpegts.js` for FLV streams.
+    -   **UX**: Displays a loading spinner with percentage progress during buffering/loading.
+    -   **Error Handling**: Implements custom timeouts, automatic retry for network errors, and error overlays.
 
 5.  **`src/components/ChannelList.tsx`**:
     -   Manages the sidebar UI for IPTV.

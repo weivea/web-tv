@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Hls from 'hls.js';
+import mpegts from 'mpegts.js';
 import { Loader } from 'lucide-react';
 
 interface PlayerProps {
@@ -20,6 +21,7 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
     if (!video) return;
 
     let hls: Hls | null = null;
+    let flvPlayer: mpegts.Player | null = null;
     let playbackTimeout: number | null = null;
 
     // Clear timeout when playback starts
@@ -44,6 +46,10 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
       if (hls) {
         hls.destroy();
         hls = null;
+      }
+      if (flvPlayer) {
+        flvPlayer.destroy();
+        flvPlayer = null;
       }
     }, 15000);
 
@@ -78,14 +84,40 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
     video.addEventListener('error', handleVideoError);
 
     let isDirectStream = false;
+    let isFlvStream = false;
     try {
       const u = new URL(url);
       isDirectStream = /\.(mp4|webm|ogg|mov|mkv)$/i.test(u.pathname);
+      isFlvStream = /\.flv$/i.test(u.pathname);
     } catch (e) {
       isDirectStream = /\.(mp4|webm|ogg|mov|mkv)($|\?)/i.test(url);
+      isFlvStream = /\.flv($|\?)/i.test(url);
     }
 
-    if (!isDirectStream && Hls.isSupported()) {
+    if (isFlvStream && mpegts.isSupported()) {
+      flvPlayer = mpegts.createPlayer({
+        type: 'flv',
+        url: url,
+        isLive: true,
+        cors: true,
+      });
+      flvPlayer.attachMediaElement(video);
+      flvPlayer.load();
+      const playPromise = flvPlayer.play();
+      if (playPromise !== undefined) {
+        playPromise.catch((e) => console.error('Error playing video:', e));
+      }
+
+      flvPlayer.on(mpegts.Events.ERROR, (type, details) => {
+        console.error('Mpegts error', type, details);
+        if (type === mpegts.ErrorTypes.NETWORK_ERROR) {
+          flvPlayer?.load(); // Try to reload on network error
+        } else {
+          setError(`Playback Error: ${type} - ${details}`);
+          setLoading(false);
+        }
+      });
+    } else if (!isDirectStream && Hls.isSupported()) {
       hls = new Hls({
         manifestLoadingTimeOut: 15000, // 15s timeout for manifest loading
         manifestLoadingMaxRetry: 2, // Max 2 retries
@@ -151,6 +183,9 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
       video.removeEventListener('error', handleVideoError);
       if (hls) {
         hls.destroy();
+      }
+      if (flvPlayer) {
+        flvPlayer.destroy();
       }
     };
   }, [url]);
