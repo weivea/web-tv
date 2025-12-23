@@ -12,6 +12,7 @@ interface WebListProps {
   selectedSiteId?: string;
   onSelect: (site: WebSite) => void;
   onAdd: (site: WebSite) => void;
+  onImport: (sites: WebSite[]) => void;
   onDelete: (id: string) => void;
   onReorder: (sites: WebSite[]) => void;
 }
@@ -21,6 +22,7 @@ const WebList: React.FC<WebListProps> = ({
   selectedSiteId,
   onSelect,
   onAdd,
+  onImport,
   onDelete,
   onReorder,
 }) => {
@@ -28,6 +30,7 @@ const WebList: React.FC<WebListProps> = ({
   const [newName, setNewName] = useState('');
   const [newCssSelector, setNewCssSelector] = useState('');
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleDragStart = (e: React.DragEvent, index: number) => {
     setDraggedIndex(index);
@@ -71,6 +74,56 @@ const WebList: React.FC<WebListProps> = ({
     }
   };
 
+  const handleExport = () => {
+    // Exclude id from export
+    const sitesToExport = sites.map(({ id, ...rest }) => rest);
+    const dataStr = JSON.stringify(sitesToExport, null, 2);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'web-tv-sites.json';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleImportClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const importedSites = JSON.parse(content);
+        if (Array.isArray(importedSites)) {
+          // Basic validation
+          const validSites = importedSites
+            .filter((s) => s.name && s.url)
+            .map((s, index) => ({
+              ...s,
+              id: s.id || `${Date.now()}-${index}`,
+            }));
+          onImport(validSites);
+        } else {
+          alert('Invalid JSON format: Expected an array of sites.');
+        }
+      } catch (error) {
+        console.error('Error parsing JSON:', error);
+        alert('Error parsing JSON file.');
+      }
+    };
+    reader.readAsText(file);
+    // Reset input so same file can be selected again
+    e.target.value = '';
+  };
+
   return (
     <div
       className="channel-list"
@@ -83,6 +136,21 @@ const WebList: React.FC<WebListProps> = ({
     >
       <div style={{ flexShrink: 0 }}>
         <h3>Web Sites</h3>
+        <div style={{ display: 'flex', gap: '5px', marginBottom: '10px' }}>
+          <button onClick={handleImportClick} style={{ flex: 1 }}>
+            Import JSON
+          </button>
+          <button onClick={handleExport} style={{ flex: 1 }}>
+            Export JSON
+          </button>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".json"
+            onChange={handleFileChange}
+          />
+        </div>
         <div style={{ marginBottom: '10px' }}>
           <input
             type="text"

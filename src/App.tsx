@@ -138,6 +138,24 @@ function App() {
     }
   };
 
+  const handleImportWebSites = (importedSites: Channel[]) => {
+    const existingUrls = new Set(webSites.map((s) => s.url));
+    const uniqueImportedSites = importedSites.filter(
+      (s) => !existingUrls.has(s.url),
+    );
+
+    if (uniqueImportedSites.length === 0) {
+      return;
+    }
+
+    const newSites = [...webSites, ...uniqueImportedSites];
+    setWebSites(newSites);
+    window.ipcRenderer.saveWebSites(newSites);
+    if (!currentWebSite && newSites.length > 0) {
+      setCurrentWebSite(newSites[0]);
+    }
+  };
+
   const handleDeleteWebSite = (id: string) => {
     const newSites = webSites.filter((s) => s.id !== id);
     setWebSites(newSites);
@@ -187,6 +205,7 @@ function App() {
               selectedSiteId={currentWebSite?.id}
               onSelect={setCurrentWebSite}
               onAdd={handleAddWebSite}
+              onImport={handleImportWebSites}
               onDelete={handleDeleteWebSite}
               onReorder={handleReorderWebSites}
             />

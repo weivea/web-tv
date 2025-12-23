@@ -32,16 +32,7 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 
 
 // IPC Handlers
 ipcMain.handle('get-channels', () => {
-  const channels = store.get('channels', [])
-  if (channels.length === 0) {
-    const defaultChannels = [
-      { id: '1', name: 'CCTV-1', url: 'https://tv.cctv.com/live/cctv1/' }, // This is likely not a direct m3u8, just a placeholder
-      { id: '2', name: 'Test Stream', url: 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8' }
-    ]
-    store.set('channels', defaultChannels)
-    return defaultChannels
-  }
-  return channels
+  return store.get('channels', []);
 })
 
 ipcMain.handle('save-channels', (_event, channels) => {
