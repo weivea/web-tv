@@ -289,7 +289,10 @@ const ChannelList: React.FC<ChannelListProps> = ({
             <li
               key={playlist.id}
               className="channel-item"
-              onClick={() => onSelectPlaylist(playlist)}
+              onClick={() => {
+                onSelectPlaylist(playlist);
+                setView('channels');
+              }}
             >
               <span style={{ flexGrow: 1 }}>{playlist.name}</span>
               <button
