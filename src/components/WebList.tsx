@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Upload, Download } from 'lucide-react';
 
 interface WebSite {
   id: string;
@@ -135,22 +136,59 @@ const WebList: React.FC<WebListProps> = ({
       }}
     >
       <div style={{ flexShrink: 0 }}>
-        <h3>Web Sites</h3>
-        <div style={{ display: 'flex', gap: '5px', marginBottom: '10px' }}>
-          <button onClick={handleImportClick} style={{ flex: 1 }}>
-            Import JSON
-          </button>
-          <button onClick={handleExport} style={{ flex: 1 }}>
-            Export JSON
-          </button>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept=".json"
-            onChange={handleFileChange}
-          />
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '10px',
+          }}
+        >
+          <h3 style={{ margin: 0 }}>Web Sites</h3>
+          <div style={{ display: 'flex', gap: '5px' }}>
+            <button
+              onClick={handleImportClick}
+              title="Import JSON"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: 'none',
+                color: 'white',
+                padding: '6px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Upload size={16} />
+            </button>
+            <button
+              onClick={handleExport}
+              title="Export JSON"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: 'none',
+                color: 'white',
+                padding: '6px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Download size={16} />
+            </button>
+          </div>
         </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          accept=".json"
+          onChange={handleFileChange}
+        />
         <div style={{ marginBottom: '10px' }}>
           <input
             type="text"
