@@ -23,6 +23,7 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
     let hls: Hls | null = null;
     let flvPlayer: mpegts.Player | null = null;
     let playbackTimeout: number | null = null;
+    let isMounted = true;
 
     // Clear timeout when playback starts
     const handlePlaybackStart = () => {
@@ -83,124 +84,192 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
 
     video.addEventListener('error', handleVideoError);
 
-    let isDirectStream = false;
-    let isFlvStream = false;
-    try {
-      const u = new URL(url);
-      isDirectStream = /\.(mp4|webm|ogg|mov|mkv)$/i.test(u.pathname);
-      isFlvStream = /\.flv$/i.test(u.pathname);
-    } catch (e) {
-      isDirectStream = /\.(mp4|webm|ogg|mov|mkv)($|\?)/i.test(url);
-      isFlvStream = /\.flv($|\?)/i.test(url);
-    }
+    const initPlayer = async () => {
+      let playUrl = url;
 
-    if (isFlvStream && mpegts.isSupported()) {
-      flvPlayer = mpegts.createPlayer(
-        {
-          type: 'flv',
-          url: url,
-          isLive: true,
-          cors: true,
-          hasAudio: true,
-          hasVideo: true,
-        },
-        {
-          enableWorker: true,
-          enableStashBuffer: true, // Enable stash buffer for better stability
-          stashInitialSize: 128,
-          autoCleanupSourceBuffer: true,
-        },
-      );
-      flvPlayer.attachMediaElement(video);
-      flvPlayer.load();
-      const playPromise = flvPlayer.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((e) => console.error('Error playing video:', e));
+      // Helper to resolve nested Master Playlists (Master -> Master -> Media)
+      // This fixes issues where hls.js might get stuck reloading a master playlist that points to another master playlist
+      const resolveMasterPlaylist = async (
+        targetUrl: string,
+        depth = 0,
+      ): Promise<string> => {
+        if (depth > 3) return targetUrl; // Avoid infinite recursion
+        try {
+          // Only attempt to resolve if it looks like an m3u8
+          if (!targetUrl.includes('.m3u8')) return targetUrl;
+
+          const response = await fetch(targetUrl);
+          const text = await response.text();
+
+          // If it contains #EXTINF, it's a Media Playlist (final destination), stop resolving
+          if (text.includes('#EXTINF:')) {
+            return targetUrl;
+          }
+
+          // Check if it is a Master Playlist (has STREAM-INF)
+          const streamInfCount = (text.match(/#EXT-X-STREAM-INF/g) || [])
+            .length;
+
+          // If it has exactly ONE variant, we can safely resolve it to that variant
+          // This handles the case where a Master Playlist just redirects to another Master/Media Playlist
+          if (streamInfCount === 1) {
+            const lines = text.split('\n');
+            for (let i = 0; i < lines.length; i++) {
+              if (lines[i].includes('#EXT-X-STREAM-INF')) {
+                // The URL is usually the next non-empty, non-comment line
+                for (let j = i + 1; j < lines.length; j++) {
+                  const line = lines[j].trim();
+                  if (line && !line.startsWith('#')) {
+                    const nextUrl = new URL(line, targetUrl).toString();
+                    // Prevent infinite loop if it points to itself
+                    if (nextUrl === targetUrl) return targetUrl;
+                    return resolveMasterPlaylist(nextUrl, depth + 1);
+                  }
+                }
+              }
+            }
+          }
+          // If it has multiple variants (ABR) or no variants (unknown), return the current URL
+          // letting hls.js handle the selection.
+          return targetUrl;
+        } catch (e) {
+          console.warn('Failed to resolve playlist, using original', e);
+          return targetUrl;
+        }
+      };
+
+      try {
+        playUrl = await resolveMasterPlaylist(url);
+      } catch (e) {
+        console.warn('Error resolving playlist', e);
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      flvPlayer.on(mpegts.Events.MEDIA_INFO, (info: any) => {
-        console.log('FLV Media Info:', info);
-        // Detect HEVC (H.265) which is often not supported in standard Electron
-        if (
-          info?.mimeType?.includes('hvc1') ||
-          info?.mimeType?.includes('hev1')
-        ) {
-          setError(
-            'Error: HEVC (H.265) video codec is not supported by this player.',
-          );
-          setLoading(false);
-        }
-      });
+      if (!isMounted) return;
 
-      flvPlayer.on(mpegts.Events.ERROR, (type, details) => {
-        console.error('Mpegts error', type, details);
-        if (type === mpegts.ErrorTypes.NETWORK_ERROR) {
-          flvPlayer?.load(); // Try to reload on network error
-        } else {
-          setError(`Playback Error: ${type} - ${details}`);
-          setLoading(false);
-        }
-      });
-    } else if (!isDirectStream && Hls.isSupported()) {
-      hls = new Hls({
-        manifestLoadingTimeOut: 15000, // 15s timeout for manifest loading
-        manifestLoadingMaxRetry: 2, // Max 2 retries
-        levelLoadingTimeOut: 15000, // 15s timeout for level loading
-        fragLoadingTimeOut: 20000, // 20s timeout for fragment loading
-      });
-      hls.loadSource(url);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch((e) => console.error('Error playing video:', e));
-      });
+      let isDirectStream = false;
+      let isFlvStream = false;
+      try {
+        const u = new URL(playUrl);
+        isDirectStream = /\.(mp4|webm|ogg|mov|mkv)$/i.test(u.pathname);
+        isFlvStream = /\.flv$/i.test(u.pathname);
+      } catch (e) {
+        isDirectStream = /\.(mp4|webm|ogg|mov|mkv)($|\?)/i.test(playUrl);
+        isFlvStream = /\.flv($|\?)/i.test(playUrl);
+      }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      hls.on('hlsFragLoadProgress' as any, (_event: any, data: any) => {
-        if (data.stats && data.stats.total > 0) {
-          const percent = Math.round(
-            (data.stats.loaded / data.stats.total) * 100,
-          );
-          setProgress(percent);
+      if (isFlvStream && mpegts.isSupported()) {
+        flvPlayer = mpegts.createPlayer(
+          {
+            type: 'flv',
+            url: playUrl,
+            isLive: true,
+            cors: true,
+            hasAudio: true,
+            hasVideo: true,
+          },
+          {
+            enableWorker: true,
+            enableStashBuffer: true, // Enable stash buffer for better stability
+            stashInitialSize: 128,
+            autoCleanupSourceBuffer: true,
+          },
+        );
+        flvPlayer.attachMediaElement(video);
+        flvPlayer.load();
+        const playPromise = flvPlayer.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((e) => console.error('Error playing video:', e));
         }
-      });
 
-      hls.on(Hls.Events.ERROR, (_event, data) => {
-        if (data.fatal) {
-          switch (data.type) {
-            case Hls.ErrorTypes.NETWORK_ERROR:
-              console.error('fatal network error encountered, try to recover');
-              hls?.startLoad();
-              break;
-            case Hls.ErrorTypes.MEDIA_ERROR:
-              console.error('fatal media error encountered, try to recover');
-              hls?.recoverMediaError();
-              break;
-            default:
-              hls?.destroy();
-              setLoading(false);
-              setError(`Playback Error: ${data.details}`);
-              break;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        flvPlayer.on(mpegts.Events.MEDIA_INFO, (info: any) => {
+          console.log('FLV Media Info:', info);
+          // Detect HEVC (H.265) which is often not supported in standard Electron
+          if (
+            info?.mimeType?.includes('hvc1') ||
+            info?.mimeType?.includes('hev1')
+          ) {
+            setError(
+              'Error: HEVC (H.265) video codec is not supported by this player.',
+            );
+            setLoading(false);
           }
-        }
-      });
-    } else if (
-      !isDirectStream &&
-      video.canPlayType('application/vnd.apple.mpegurl')
-    ) {
-      video.src = url;
-      video.addEventListener('loadedmetadata', () => {
-        video.play().catch((e) => console.error('Error playing video:', e));
-      });
-    } else {
-      // Direct playback for MP4 or other supported formats
-      video.src = url;
-      video.addEventListener('loadedmetadata', () => {
-        video.play().catch((e) => console.error('Error playing video:', e));
-      });
-    }
+        });
+
+        flvPlayer.on(mpegts.Events.ERROR, (type, details) => {
+          console.error('Mpegts error', type, details);
+          if (type === mpegts.ErrorTypes.NETWORK_ERROR) {
+            flvPlayer?.load(); // Try to reload on network error
+          } else {
+            setError(`Playback Error: ${type} - ${details}`);
+            setLoading(false);
+          }
+        });
+      } else if (!isDirectStream && Hls.isSupported()) {
+        hls = new Hls({
+          manifestLoadingTimeOut: 15000, // 15s timeout for manifest loading
+          manifestLoadingMaxRetry: 2, // Max 2 retries
+          levelLoadingTimeOut: 15000, // 15s timeout for level loading
+          fragLoadingTimeOut: 20000, // 20s timeout for fragment loading
+        });
+        hls.loadSource(playUrl);
+        hls.attachMedia(video);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          video.play().catch((e) => console.error('Error playing video:', e));
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        hls.on('hlsFragLoadProgress' as any, (_event: any, data: any) => {
+          if (data.stats && data.stats.total > 0) {
+            const percent = Math.round(
+              (data.stats.loaded / data.stats.total) * 100,
+            );
+            setProgress(percent);
+          }
+        });
+
+        hls.on(Hls.Events.ERROR, (_event, data) => {
+          if (data.fatal) {
+            switch (data.type) {
+              case Hls.ErrorTypes.NETWORK_ERROR:
+                console.error(
+                  'fatal network error encountered, try to recover',
+                );
+                hls?.startLoad();
+                break;
+              case Hls.ErrorTypes.MEDIA_ERROR:
+                console.error('fatal media error encountered, try to recover');
+                hls?.recoverMediaError();
+                break;
+              default:
+                hls?.destroy();
+                setLoading(false);
+                setError(`Playback Error: ${data.details}`);
+                break;
+            }
+          }
+        });
+      } else if (
+        !isDirectStream &&
+        video.canPlayType('application/vnd.apple.mpegurl')
+      ) {
+        video.src = playUrl;
+        video.addEventListener('loadedmetadata', () => {
+          video.play().catch((e) => console.error('Error playing video:', e));
+        });
+      } else {
+        // Direct playback for MP4 or other supported formats
+        video.src = playUrl;
+        video.addEventListener('loadedmetadata', () => {
+          video.play().catch((e) => console.error('Error playing video:', e));
+        });
+      }
+    };
+
+    initPlayer();
 
     return () => {
+      isMounted = false;
       if (playbackTimeout) clearTimeout(playbackTimeout);
       video.removeEventListener('playing', handlePlaybackStart);
       video.removeEventListener('waiting', handleWaiting);
