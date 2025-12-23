@@ -1,0 +1,282 @@
+[
+  {
+    "name": "CCTV-1",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001859",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-2",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001800",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-3",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001801",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-4",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001814",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-5",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001818",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-5+",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001817",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-6",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600108442",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-7",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600004092",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-8",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001803",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-9",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600004078",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-10",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001805",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-11",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001806",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-12",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001807",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-13",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001811",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-14",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001809",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-15",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001815",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-16-HD",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600098637",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-16-4K",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600099502",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-17",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600001810",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-4K",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002264",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CCTV-8K",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600156816",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CGTN",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600014550",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "CGTN外语记录频道",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600016000847814550",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "北京卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002309",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "江苏卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002521",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "东方卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002483",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "浙江卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002520",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "湖南卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002475",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "湖北卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002508",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "广东卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002485",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "广西卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002509",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "黑龙江卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002498",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "东方卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002506",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "海南卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002483",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "重庆卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002531",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "深证卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002481",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "四川卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002516",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "河南卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002525",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "福建东南卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002484",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "贵州卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002490",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "江西卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002503",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "辽宁卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002505",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "安徽卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002532",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "河北卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002493",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "山东卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600002513",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "天津卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600152137",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "吉林卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190405",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "陕西卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190400",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "宁夏卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190737",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "内蒙古卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190401",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "云南卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190402",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "山西卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190407",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "青海卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190406",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "西藏卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600190403",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "新疆卫视",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600152138",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "中国教育电视台1频道",
+    "url": "https://www.yangshipin.cn/tv/home?pid=600171827",
+    "cssSelector": ".tv-main-con-l-vid > div"
+  }
+]
