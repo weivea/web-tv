@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WebTVProps {
   isActive: boolean;
@@ -7,8 +7,46 @@ interface WebTVProps {
 
 const WebTV = ({ isActive, currentSite }: WebTVProps) => {
   const webviewRef = useRef<any>(null);
+  const [hasActivated, setHasActivated] = useState(false);
 
   useEffect(() => {
+    if (isActive) {
+      setHasActivated(true);
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    const webview = webviewRef.current;
+    if (!webview) return;
+
+    if (!isActive) {
+      try {
+        webview.setAudioMuted(true);
+        webview
+          .executeJavaScript(
+            `document.querySelectorAll('video, audio').forEach(el => el.pause());`,
+          )
+          .catch(() => {});
+      } catch (e) {
+        console.error('Failed to pause webview', e);
+      }
+    } else {
+      try {
+        webview.setAudioMuted(false);
+        webview
+          .executeJavaScript(
+            `document.querySelectorAll('video, audio').forEach(el => el.play());`,
+          )
+          .catch(() => {});
+      } catch (e) {
+        console.error('Failed to unmute webview', e);
+      }
+    }
+  }, [isActive]);
+
+  useEffect(() => {
+    if (!hasActivated) return;
+
     const webview = webviewRef.current;
     if (!webview || !currentSite?.cssSelector) return;
 
@@ -44,38 +82,13 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
     webview.addEventListener('dom-ready', injectCss);
 
     return () => {
-      webview.removeEventListener('dom-ready', injectCss);
+      try {
+        webview.removeEventListener('dom-ready', injectCss);
+      } catch (e) {
+        // Ignore errors if webview is destroyed
+      }
     };
-  }, [currentSite]);
-
-  useEffect(() => {
-    const webview = webviewRef.current;
-    if (!webview) return;
-
-    if (!isActive) {
-      try {
-        webview.setAudioMuted(true);
-        webview
-          .executeJavaScript(
-            `document.querySelectorAll('video, audio').forEach(el => el.pause());`,
-          )
-          .catch(() => {});
-      } catch (e) {
-        console.error('Failed to pause webview', e);
-      }
-    } else {
-      try {
-        webview.setAudioMuted(false);
-        webview
-          .executeJavaScript(
-            `document.querySelectorAll('video, audio').forEach(el => el.play());`,
-          )
-          .catch(() => {});
-      } catch (e) {
-        console.error('Failed to unmute webview', e);
-      }
-    }
-  }, [isActive]);
+  }, [currentSite, hasActivated]);
 
   return (
     <div
@@ -85,7 +98,7 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
         height: '100%',
       }}
     >
-      {currentSite ? (
+      {hasActivated && currentSite ? (
         <>
           <webview
             ref={webviewRef}
