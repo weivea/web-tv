@@ -2,15 +2,20 @@ import { app, BrowserWindow, ipcMain } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
+import fs from 'node:fs';
 
-const require = createRequire(import.meta.url)
-const Store = require('electron-store')
+const require = createRequire(import.meta.url);
+const Store = require('electron-store');
 
-const store = new Store()
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
+const store = new Store();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Ignore certificate errors
-app.commandLine.appendSwitch('ignore-certificate-errors')
+app.commandLine.appendSwitch('ignore-certificate-errors');
+
+if (process.platform === 'win32') {
+  app.setAppUserModelId(app.getName());
+}
 
 // The built directory structure
 //
@@ -21,23 +26,25 @@ app.commandLine.appendSwitch('ignore-certificate-errors')
 // │ │ ├── main.js
 // │ │ └── preload.mjs
 // │
-process.env.APP_ROOT = path.join(__dirname, '..')
+process.env.APP_ROOT = path.join(__dirname, '..');
 
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
-export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL']
-export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron')
-export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist')
+export const VITE_DEV_SERVER_URL = process.env['VITE_DEV_SERVER_URL'];
+export const MAIN_DIST = path.join(process.env.APP_ROOT, 'dist-electron');
+export const RENDERER_DIST = path.join(process.env.APP_ROOT, 'dist');
 
-process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL ? path.join(process.env.APP_ROOT, 'public') : RENDERER_DIST
+process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
+  ? path.join(process.env.APP_ROOT, 'public')
+  : RENDERER_DIST;
 
 // IPC Handlers
 ipcMain.handle('get-channels', () => {
   return store.get('channels', []);
-})
+});
 
 ipcMain.handle('save-channels', (_event, channels) => {
-  store.set('channels', channels)
-})
+  store.set('channels', channels);
+});
 
 ipcMain.handle('get-web-sites', () => {
   return store.get('webSites', []);
@@ -66,9 +73,20 @@ ipcMain.handle('save-last-state', (_event, state) => {
 
 let win: BrowserWindow | null;
 
+function getIconPath() {
+  const iconList = ['icon.ico', 'icon.png', 'icon.svg'];
+  for (const icon of iconList) {
+    const iconPath = path.join(process.env.VITE_PUBLIC, icon);
+    if (fs.existsSync(iconPath)) {
+      return iconPath;
+    }
+  }
+  return path.join(process.env.VITE_PUBLIC, 'icon.svg');
+}
+
 function createWindow() {
   win = new BrowserWindow({
-    icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    icon: getIconPath(),
     frame: false, // Frameless window
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
