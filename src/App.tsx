@@ -97,17 +97,30 @@ function App() {
   ) => {
     setCurrentPlaylist(playlist);
     setPlaylistChannels([]); // Clear while loading
-    setCurrentChannel(null);
+    // Do not clear current channel to allow seamless playback
+    // setCurrentChannel(null);
 
     try {
       const text = await window.ipcRenderer.fetchUrl(playlist.url);
       if (text.includes('#EXTM3U')) {
         const parsedChannels = parseM3U(text);
-        const channels = parsedChannels.map((c, index) => ({
-          id: Date.now().toString() + '-' + index,
-          name: c.name,
-          url: c.url,
-        }));
+        
+        const idCounts: Record<string, number> = {};
+        const channels = parsedChannels.map((c) => {
+          let id = c.url;
+          if (idCounts[id]) {
+            idCounts[id]++;
+            id = `${id}-${idCounts[id]}`;
+          } else {
+            idCounts[id] = 1;
+          }
+          return {
+            id,
+            name: c.name,
+            url: c.url,
+          };
+        });
+
         setPlaylistChannels(channels);
 
         if (restoreChannelId) {
