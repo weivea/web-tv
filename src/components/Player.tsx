@@ -95,18 +95,43 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
     }
 
     if (isFlvStream && mpegts.isSupported()) {
-      flvPlayer = mpegts.createPlayer({
-        type: 'flv',
-        url: url,
-        isLive: true,
-        cors: true,
-      });
+      flvPlayer = mpegts.createPlayer(
+        {
+          type: 'flv',
+          url: url,
+          isLive: true,
+          cors: true,
+          hasAudio: true,
+          hasVideo: true,
+        },
+        {
+          enableWorker: true,
+          enableStashBuffer: true, // Enable stash buffer for better stability
+          stashInitialSize: 128,
+          autoCleanupSourceBuffer: true,
+        },
+      );
       flvPlayer.attachMediaElement(video);
       flvPlayer.load();
       const playPromise = flvPlayer.play();
       if (playPromise !== undefined) {
         playPromise.catch((e) => console.error('Error playing video:', e));
       }
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      flvPlayer.on(mpegts.Events.MEDIA_INFO, (info: any) => {
+        console.log('FLV Media Info:', info);
+        // Detect HEVC (H.265) which is often not supported in standard Electron
+        if (
+          info?.mimeType?.includes('hvc1') ||
+          info?.mimeType?.includes('hev1')
+        ) {
+          setError(
+            'Error: HEVC (H.265) video codec is not supported by this player.',
+          );
+          setLoading(false);
+        }
+      });
 
       flvPlayer.on(mpegts.Events.ERROR, (type, details) => {
         console.error('Mpegts error', type, details);

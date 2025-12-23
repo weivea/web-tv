@@ -12,6 +12,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 // Ignore certificate errors
 app.commandLine.appendSwitch('ignore-certificate-errors');
+// Enable HEVC (H.265) hardware decoding if available on the OS
+app.commandLine.appendSwitch('enable-features', 'PlatformHEVCDecoderSupport');
+
 
 if (process.platform === 'win32') {
   app.setAppUserModelId(app.getName());
