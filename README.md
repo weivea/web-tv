@@ -18,6 +18,7 @@ A modern, lightweight IPTV player built with Electron, React, and TypeScript. De
   - **SSL Compatibility**: Automatically bypasses SSL certificate errors to support a wider range of streams.
 - **🎨 Modern UI**:
   - **Frameless Design**: Custom title bar with a sleek, immersive look.
+  - **Fullscreen Mode**: App launches in fullscreen mode by default for an immersive experience.
   - **Auto-Hide Controls**: Title bar and window controls automatically fade out when not in use to maximize viewing area.
   - **Web TV Mode**: Integrated browser view for navigating web-based streaming sites.
 - **⚡ Modern Tech Stack**: Built with Vite for lightning-fast development and build performance.
