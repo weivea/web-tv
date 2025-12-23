@@ -85,16 +85,34 @@ function createWindow() {
     },
   });
 
+  // Handle Esc key to exit fullscreen
+  const handleEscKey = (_event: Electron.Event, input: Electron.Input) => {
+    if (input.key === 'Escape' && input.type === 'keyDown') {
+      if (win?.isFullScreen()) {
+        win.setFullScreen(false);
+      }
+    }
+  };
+
+  win.webContents.on('before-input-event', handleEscKey);
+
+  win.webContents.on('did-attach-webview', (_event, webContents) => {
+    webContents.on('before-input-event', handleEscKey);
+  });
+
   // Window controls
   ipcMain.on('minimize-window', () => {
     win?.minimize();
   });
 
   ipcMain.on('maximize-window', () => {
-    if (win?.isMaximized()) {
-      win?.unmaximize();
-    } else {
-      win?.maximize();
+    const isFullScreen = win?.isFullScreen();
+    win?.setFullScreen(!isFullScreen);
+  });
+
+  ipcMain.on('exit-fullscreen', () => {
+    if (win?.isFullScreen()) {
+      win?.setFullScreen(false);
     }
   });
 
