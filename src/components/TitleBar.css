@@ -29,15 +29,14 @@
   display: flex;
   -webkit-app-region: no-drag;
   pointer-events: auto; /* Capture clicks on buttons */
-  padding-right: 8px;
 }
 
 .control-btn {
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.8);
-  width: 32px;
-  height: 32px;
+  width: 40px;
+  height: 40px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -46,9 +45,12 @@
   padding: 0;
   border-radius: 0; /* Windows style usually square or slightly rounded */
 }
+.control-btn.close {
+  width: 48px;
+}
 
 .control-btn:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.4);
   color: #fff;
 }
 
