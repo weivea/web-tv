@@ -21,6 +21,7 @@ A modern, lightweight IPTV player built with Electron, React, and TypeScript. De
   - **Fullscreen Mode**: App launches in fullscreen mode by default for an immersive experience.
   - **Auto-Hide Controls**: Title bar and window controls automatically fade out when not in use to maximize viewing area.
   - **Web TV Mode**: Integrated browser view for navigating web-based streaming sites.
+    - **Smart Fullscreen**: Automatically injects CSS to force video players to fullscreen on supported sites.
 - **⚡ Modern Tech Stack**: Built with Vite for lightning-fast development and build performance.
 
 ## Tech Stack

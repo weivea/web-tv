@@ -56,6 +56,7 @@ This document provides context and guidelines for AI agents assisting with the d
     -   **Playback Engine**: Wraps `hls.js` for HLS streams and `mpegts.js` for FLV streams.
     -   **UX**: Displays a loading spinner with percentage progress during buffering/loading.
     -   **Error Handling**: Implements custom timeouts, automatic retry for network errors, and error overlays.
+    -   **Advanced Logic**: Recursively resolves nested Master Playlists to ensure playback stability.
 
 5.  **`src/components/ChannelList.tsx`**:
     -   Manages the sidebar UI for IPTV.
@@ -69,6 +70,7 @@ This document provides context and guidelines for AI agents assisting with the d
 7.  **`src/components/web-tv/index.tsx`**:
     -   **Web View Wrapper**: Wraps the Electron `webview` tag.
     -   **Lifecycle Management**: Handles muting/unmuting and pausing/playing media via `executeJavaScript` when switching tabs.
+    -   **CSS Injection**: Injects CSS to force the video player to fullscreen within the webview if a CSS selector is provided.
 
 8.  **`src/utils/m3uParser.ts`**:
     -   Parses raw M3U text content.
