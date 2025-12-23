@@ -217,7 +217,7 @@ const WebList: React.FC<WebListProps> = ({
         </div>
       </div>
       <div
-        style={{ flexGrow: 1, overflowY: 'auto' }}
+        style={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}
         className="channel-scroll-area"
       >
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>

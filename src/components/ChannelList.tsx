@@ -154,7 +154,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
 
         <div
           className="channel-scroll-area"
-          style={{ flexGrow: 1, overflowY: 'auto' }}
+          style={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}
         >
           {channels.length === 0 ? (
             <div
@@ -253,7 +253,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
 
       <div
         className="channel-scroll-area"
-        style={{ flexGrow: 1, overflowY: 'auto' }}
+        style={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}
       >
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {playlists.map((playlist) => (
