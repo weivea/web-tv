@@ -22,9 +22,9 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   },
 
   // Store API
-  getChannels: () => ipcRenderer.invoke('get-channels'),
-  saveChannels: (channels: any) =>
-    ipcRenderer.invoke('save-channels', channels),
+  getPlaylists: () => ipcRenderer.invoke('get-playlists'),
+  savePlaylists: (playlists: any) =>
+    ipcRenderer.invoke('save-playlists', playlists),
   getWebSites: () => ipcRenderer.invoke('get-web-sites'),
   saveWebSites: (sites: any) => ipcRenderer.invoke('save-web-sites', sites),
   getLastState: () => ipcRenderer.invoke('get-last-state'),

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { parseM3U } from '../utils/m3uParser';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft, Trash2, Plus, Upload, Download, Play } from 'lucide-react';
 
 interface Channel {
   id: string;
@@ -7,180 +7,283 @@ interface Channel {
   url: string;
 }
 
+interface Playlist {
+  id: string;
+  name: string;
+  url: string;
+}
+
 interface ChannelListProps {
+  playlists: Playlist[];
+  selectedPlaylistId?: string;
   channels: Channel[];
   selectedChannelId?: string;
-  onSelect: (channel: Channel) => void;
-  onAdd: (channel: Channel) => void;
-  onImport: (channels: Channel[]) => void;
-  onDelete: (id: string) => void;
-  onClear: () => void;
+  onSelectPlaylist: (playlist: Playlist) => void;
+  onAddPlaylist: (playlist: Playlist) => void;
+  onImportPlaylists: (playlists: Playlist[]) => void;
+  onDeletePlaylist: (id: string) => void;
+  onSelectChannel: (channel: Channel) => void;
 }
 
 const ChannelList: React.FC<ChannelListProps> = ({
+  playlists,
+  selectedPlaylistId,
   channels,
   selectedChannelId,
-  onSelect,
-  onAdd,
-  onImport,
-  onDelete,
-  onClear,
+  onSelectPlaylist,
+  onAddPlaylist,
+  onImportPlaylists,
+  onDeletePlaylist,
+  onSelectChannel,
 }) => {
-  const [newUrl, setNewUrl] = useState('');
-  const [newName, setNewName] = useState('');
-  const [isImporting, setIsImporting] = useState(false);
+  const [view, setView] = useState<'playlists' | 'channels'>('playlists');
+  const [newPlaylistName, setNewPlaylistName] = useState('');
+  const [newPlaylistUrl, setNewPlaylistUrl] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAdd = async () => {
-    if (!newUrl) return;
-
-    // Check if it might be a playlist
-    if (newUrl.endsWith('.m3u') || newUrl.endsWith('.m3u8')) {
-      // Try to fetch and see if it's a playlist
-      try {
-        setIsImporting(true);
-
-        try {
-          // Use IPC to fetch to avoid CORS issues
-          const text = await Promise.race([
-            window.ipcRenderer.fetchUrl(newUrl),
-            new Promise<string>((_, reject) =>
-              setTimeout(() => reject(new Error('Timeout')), 15000),
-            ),
-          ]);
-
-          if (text.includes('#EXTM3U')) {
-            const parsedChannels = parseM3U(text);
-            const channelsToAdd = parsedChannels.map((c, index) => ({
-              id: Date.now().toString() + '-' + index,
-              name: c.name,
-              url: c.url,
-            }));
-
-            if (channelsToAdd.length > 0) {
-              onImport(channelsToAdd);
-              setNewUrl('');
-              setNewName('');
-              setIsImporting(false);
-              return;
-            }
-          }
-        } catch (fetchError) {
-          if (fetchError instanceof Error && fetchError.message === 'Timeout') {
-            alert('Import timed out after 15 seconds');
-          } else {
-            throw fetchError;
-          }
-        }
-      } catch (error) {
-        console.error('Failed to import playlist', error);
-      } finally {
-        setIsImporting(false);
-      }
-    }
-
-    if (newName) {
-      onAdd({
-        id: Date.now().toString(),
-        name: newName,
-        url: newUrl,
-      });
-      setNewName('');
-      setNewUrl('');
+  useEffect(() => {
+    if (selectedPlaylistId) {
+      setView('channels');
     } else {
-      // If no name provided but url is there, use url as name or ask for name
-      // For now, let's require name for single channel
-      alert('Please provide a name for the channel');
+      setView('playlists');
+    }
+  }, [selectedPlaylistId]);
+
+  const handleAdd = () => {
+    if (newPlaylistName && newPlaylistUrl) {
+      onAddPlaylist({
+        id: Date.now().toString(),
+        name: newPlaylistName,
+        url: newPlaylistUrl,
+      });
+      setNewPlaylistName('');
+      setNewPlaylistUrl('');
     }
   };
+
+  const handleImportFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const json = JSON.parse(content);
+        if (Array.isArray(json)) {
+          const imported = json
+            .filter((item: any) => item.name && item.url)
+            .map((item: any, index: number) => ({
+              id: Date.now().toString() + '-' + index,
+              name: item.name,
+              url: item.url,
+            }));
+          onImportPlaylists(imported);
+        } else {
+          alert('Invalid JSON format: Expected an array');
+        }
+      } catch (error) {
+        console.error('Import failed', error);
+        alert('Failed to parse JSON file');
+      }
+      // Reset input
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    };
+    reader.readAsText(file);
+  };
+
+  const handleExport = () => {
+    const data = playlists.map(({ name, url }) => ({ name, url }));
+    const blob = new Blob([JSON.stringify(data, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'iptvs.json';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  if (view === 'channels' && selectedPlaylistId) {
+    const currentPlaylist = playlists.find((p) => p.id === selectedPlaylistId);
+    return (
+      <div
+        className="channel-list"
+        style={{ height: '100%', display: 'flex', flexDirection: 'column' }}
+      >
+        <div
+          style={{
+            padding: '10px',
+            borderBottom: '1px solid #333',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+          }}
+        >
+          <button
+            onClick={() => {
+              setView('playlists');
+              // Optionally clear selection if needed, but keeping it allows quick return
+            }}
+            className="icon-btn"
+            title="Back to Playlists"
+            style={{
+              background: 'none',
+              border: 'none',
+              color: 'white',
+              cursor: 'pointer',
+            }}
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <h3
+            style={{
+              margin: 0,
+              fontSize: '16px',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {currentPlaylist?.name || 'Channels'}
+          </h3>
+        </div>
+
+        <div
+          className="channel-scroll-area"
+          style={{ flexGrow: 1, overflowY: 'auto' }}
+        >
+          {channels.length === 0 ? (
+            <div
+              style={{ padding: '20px', textAlign: 'center', color: '#888' }}
+            >
+              Loading channels...
+            </div>
+          ) : (
+            <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+              {channels.map((channel) => (
+                <li
+                  key={channel.id}
+                  className={`channel-item ${
+                    selectedChannelId === channel.id ? 'selected' : ''
+                  }`}
+                  onClick={() => onSelectChannel(channel)}
+                >
+                  <span style={{ flexGrow: 1 }}>{channel.name}</span>
+                  {selectedChannelId === channel.id && <Play size={14} />}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div
       className="channel-list"
       style={{
-        padding: '10px',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
+        padding: '10px',
       }}
     >
-      <div style={{ flexShrink: 0 }}>
-        <h3>Channels</h3>
-        <div style={{ marginBottom: '10px' }}>
+      <div style={{ marginBottom: '15px' }}>
+        <h3 style={{ marginTop: 0 }}>Playlists</h3>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '5px',
+            marginBottom: '10px',
+          }}
+        >
           <input
             type="text"
-            placeholder="Name (Optional for Playlist)"
-            value={newName}
-            onChange={(e) => setNewName(e.target.value)}
-            style={{ marginBottom: '5px' }}
+            placeholder="Playlist Name"
+            value={newPlaylistName}
+            onChange={(e) => setNewPlaylistName(e.target.value)}
+            className="input-field"
           />
           <input
             type="text"
-            placeholder="M3U8 URL"
-            value={newUrl}
-            onChange={(e) => setNewUrl(e.target.value)}
-            style={{ marginBottom: '5px' }}
+            placeholder="Playlist URL (.m3u)"
+            value={newPlaylistUrl}
+            onChange={(e) => setNewPlaylistUrl(e.target.value)}
+            className="input-field"
           />
           <button
             onClick={handleAdd}
-            style={{ width: '100%', marginBottom: '5px' }}
-            disabled={isImporting}
+            className="action-btn primary"
+            disabled={!newPlaylistName || !newPlaylistUrl}
           >
-            {isImporting ? 'Importing...' : 'Add / Import URL'}
+            <Plus size={16} style={{ marginRight: '5px' }} /> Add Playlist
           </button>
-          {channels.length > 0 && (
-            <button
-              onClick={() => {
-                if (confirm('Are you sure you want to clear all channels?')) {
-                  onClear();
-                }
-              }}
-              style={{
-                width: '100%',
-                backgroundColor: '#ef4444',
-                color: 'white',
-                border: 'none',
-              }}
-            >
-              Clear All
-            </button>
-          )}
+        </div>
+
+        <div style={{ display: 'flex', gap: '5px' }}>
+          <input
+            type="file"
+            ref={fileInputRef}
+            style={{ display: 'none' }}
+            accept=".json"
+            onChange={handleImportFile}
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="action-btn secondary"
+            style={{ flex: 1 }}
+          >
+            <Upload size={16} style={{ marginRight: '5px' }} /> Import JSON
+          </button>
+          <button
+            onClick={handleExport}
+            className="action-btn secondary"
+            style={{ flex: 1 }}
+          >
+            <Download size={16} style={{ marginRight: '5px' }} /> Export
+          </button>
         </div>
       </div>
+
       <div
-        style={{ flexGrow: 1, overflowY: 'auto' }}
         className="channel-scroll-area"
+        style={{ flexGrow: 1, overflowY: 'auto' }}
       >
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
-          {channels.map((channel) => (
+          {playlists.map((playlist) => (
             <li
-              key={channel.id}
-              className={`channel-item ${
-                selectedChannelId === channel.id ? 'selected' : ''
-              }`}
-              onClick={() => onSelect(channel)}
+              key={playlist.id}
+              className="channel-item"
+              onClick={() => onSelectPlaylist(playlist)}
             >
-              <span
-                style={{
-                  flexGrow: 1,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {channel.name}
-              </span>
+              <span style={{ flexGrow: 1 }}>{playlist.name}</span>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onDelete(channel.id);
+                  if (confirm(`Delete playlist "${playlist.name}"?`)) {
+                    onDeletePlaylist(playlist.id);
+                  }
                 }}
                 className="delete-btn"
               >
-                X
+                <Trash2 size={14} />
               </button>
             </li>
           ))}
         </ul>
+        {playlists.length === 0 && (
+          <div
+            style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}
+          >
+            No playlists added.
+          </div>
+        )}
       </div>
     </div>
   );

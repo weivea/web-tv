@@ -38,12 +38,12 @@ process.env.VITE_PUBLIC = VITE_DEV_SERVER_URL
   : RENDERER_DIST;
 
 // IPC Handlers
-ipcMain.handle('get-channels', () => {
-  return store.get('channels', []);
+ipcMain.handle('get-playlists', () => {
+  return store.get('playlists', []);
 });
 
-ipcMain.handle('save-channels', (_event, channels) => {
-  store.set('channels', channels);
+ipcMain.handle('save-playlists', (_event, playlists) => {
+  store.set('playlists', playlists);
 });
 
 ipcMain.handle('get-web-sites', () => {
@@ -56,6 +56,7 @@ ipcMain.handle('save-web-sites', (_event, sites) => {
 
 ipcMain.handle('get-last-state', () => {
   return {
+    lastPlaylistId: store.get('lastPlaylistId'),
     lastChannelId: store.get('lastChannelId'),
     lastWebSiteId: store.get('lastWebSiteId'),
     lastActiveTab: store.get('lastActiveTab', 'iptv'),
@@ -63,6 +64,8 @@ ipcMain.handle('get-last-state', () => {
 });
 
 ipcMain.handle('save-last-state', (_event, state) => {
+  if (state.lastPlaylistId !== undefined)
+    store.set('lastPlaylistId', state.lastPlaylistId);
   if (state.lastChannelId !== undefined)
     store.set('lastChannelId', state.lastChannelId);
   if (state.lastWebSiteId !== undefined)

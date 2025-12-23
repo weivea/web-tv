@@ -5,6 +5,7 @@ import ChannelList from './components/ChannelList';
 import WebList from './components/WebList';
 import WebTV from './components/web-tv';
 import TitleBar from './components/TitleBar';
+import { parseM3U } from './utils/m3uParser';
 
 interface Channel {
   id: string;
@@ -13,13 +14,22 @@ interface Channel {
   cssSelector?: string;
 }
 
+interface Playlist {
+  id: string;
+  name: string;
+  url: string;
+  count?: number;
+}
+
 type Tab = 'iptv' | 'webtv';
 
 function App() {
   const [activeTab, setActiveTab] = useState<Tab>('iptv');
 
   // IPTV State
-  const [channels, setChannels] = useState<Channel[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [currentPlaylist, setCurrentPlaylist] = useState<Playlist | null>(null);
+  const [playlistChannels, setPlaylistChannels] = useState<Channel[]>([]);
   const [currentChannel, setCurrentChannel] = useState<Channel | null>(null);
 
   // Web TV State
@@ -32,19 +42,21 @@ function App() {
 
   useEffect(() => {
     const loadData = async () => {
-      const [savedChannels, savedSites, lastState] = await Promise.all([
-        window.ipcRenderer.getChannels(),
+      const [savedPlaylists, savedSites, lastState] = await Promise.all([
+        window.ipcRenderer.getPlaylists(),
         window.ipcRenderer.getWebSites(),
         window.ipcRenderer.getLastState(),
       ]);
 
-      if (savedChannels && Array.isArray(savedChannels)) {
-        setChannels(savedChannels);
-        if (savedChannels.length > 0) {
-          const lastChannel = savedChannels.find(
-            (c) => c.id === lastState.lastChannelId,
+      if (savedPlaylists && Array.isArray(savedPlaylists)) {
+        setPlaylists(savedPlaylists);
+        if (savedPlaylists.length > 0) {
+          const lastPlaylist = savedPlaylists.find(
+            (p) => p.id === lastState.lastPlaylistId,
           );
-          setCurrentChannel(lastChannel || savedChannels[0]);
+          if (lastPlaylist) {
+            handleSelectPlaylist(lastPlaylist, lastState.lastChannelId);
+          }
         }
       }
 
@@ -72,11 +84,41 @@ function App() {
     if (!isLoaded) return;
 
     window.ipcRenderer.saveLastState({
+      lastPlaylistId: currentPlaylist?.id,
       lastChannelId: currentChannel?.id,
       lastWebSiteId: currentWebSite?.id,
       lastActiveTab: activeTab,
     });
-  }, [currentChannel, currentWebSite, activeTab, isLoaded]);
+  }, [currentPlaylist, currentChannel, currentWebSite, activeTab, isLoaded]);
+
+  const handleSelectPlaylist = async (
+    playlist: Playlist,
+    restoreChannelId?: string,
+  ) => {
+    setCurrentPlaylist(playlist);
+    setPlaylistChannels([]); // Clear while loading
+    setCurrentChannel(null);
+
+    try {
+      const text = await window.ipcRenderer.fetchUrl(playlist.url);
+      if (text.includes('#EXTM3U')) {
+        const parsedChannels = parseM3U(text);
+        const channels = parsedChannels.map((c, index) => ({
+          id: Date.now().toString() + '-' + index,
+          name: c.name,
+          url: c.url,
+        }));
+        setPlaylistChannels(channels);
+
+        if (restoreChannelId) {
+          const restored = channels.find((c) => c.id === restoreChannelId);
+          if (restored) setCurrentChannel(restored);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load playlist', error);
+    }
+  };
 
   const handleMouseMove = useCallback(
     (e: React.MouseEvent) => {
@@ -100,38 +142,41 @@ function App() {
     [isSidebarVisible],
   );
 
-  // Channel Handlers
-  const handleAddChannel = (channel: Channel) => {
-    const newChannels = [...channels, channel];
-    setChannels(newChannels);
-    window.ipcRenderer.saveChannels(newChannels);
-    if (!currentChannel) {
-      setCurrentChannel(channel);
+  // Playlist Handlers
+  const handleAddPlaylist = (playlist: Playlist) => {
+    const newPlaylists = [...playlists, playlist];
+    setPlaylists(newPlaylists);
+    window.ipcRenderer.savePlaylists(newPlaylists);
+    if (!currentPlaylist) {
+      handleSelectPlaylist(playlist);
     }
   };
 
-  const handleImportChannels = (importedChannels: Channel[]) => {
-    const newChannels = [...channels, ...importedChannels];
-    setChannels(newChannels);
-    window.ipcRenderer.saveChannels(newChannels);
-    if (!currentChannel && newChannels.length > 0) {
-      setCurrentChannel(newChannels[0]);
+  const handleImportPlaylists = (importedPlaylists: Playlist[]) => {
+    const existingUrls = new Set(playlists.map((p) => p.url));
+    const uniqueImported = importedPlaylists.filter(
+      (p) => !existingUrls.has(p.url),
+    );
+
+    if (uniqueImported.length === 0) return;
+
+    const newPlaylists = [...playlists, ...uniqueImported];
+    setPlaylists(newPlaylists);
+    window.ipcRenderer.savePlaylists(newPlaylists);
+    if (!currentPlaylist && newPlaylists.length > 0) {
+      handleSelectPlaylist(newPlaylists[0]);
     }
   };
 
-  const handleDeleteChannel = (id: string) => {
-    const newChannels = channels.filter((c) => c.id !== id);
-    setChannels(newChannels);
-    window.ipcRenderer.saveChannels(newChannels);
-    if (currentChannel?.id === id) {
-      setCurrentChannel(newChannels.length > 0 ? newChannels[0] : null);
+  const handleDeletePlaylist = (id: string) => {
+    const newPlaylists = playlists.filter((p) => p.id !== id);
+    setPlaylists(newPlaylists);
+    window.ipcRenderer.savePlaylists(newPlaylists);
+    if (currentPlaylist?.id === id) {
+      setCurrentPlaylist(null);
+      setPlaylistChannels([]);
+      setCurrentChannel(null);
     }
-  };
-
-  const handleClearChannels = () => {
-    setChannels([]);
-    window.ipcRenderer.saveChannels([]);
-    setCurrentChannel(null);
   };
 
   // Web Site Handlers
@@ -198,13 +243,15 @@ function App() {
         <div className="sidebar-content">
           {activeTab === 'iptv' ? (
             <ChannelList
-              channels={channels}
+              playlists={playlists}
+              selectedPlaylistId={currentPlaylist?.id}
+              channels={playlistChannels}
               selectedChannelId={currentChannel?.id}
-              onSelect={setCurrentChannel}
-              onAdd={handleAddChannel}
-              onImport={handleImportChannels}
-              onDelete={handleDeleteChannel}
-              onClear={handleClearChannels}
+              onSelectPlaylist={(p) => handleSelectPlaylist(p)}
+              onAddPlaylist={handleAddPlaylist}
+              onImportPlaylists={handleImportPlaylists}
+              onDeletePlaylist={handleDeletePlaylist}
+              onSelectChannel={setCurrentChannel}
             />
           ) : (
             <WebList
