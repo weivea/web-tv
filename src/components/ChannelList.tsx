@@ -194,7 +194,52 @@ const ChannelList: React.FC<ChannelListProps> = ({
       }}
     >
       <div style={{ marginBottom: '15px' }}>
-        <h3 style={{ marginTop: 0 }}>Playlists</h3>
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '10px',
+          }}
+        >
+          <h3 style={{ margin: 0 }}>Playlists</h3>
+          <div style={{ display: 'flex', gap: '5px' }}>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              title="Import JSON"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: 'none',
+                color: 'white',
+                padding: '6px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Upload size={16} />
+            </button>
+            <button
+              onClick={handleExport}
+              title="Export JSON"
+              style={{
+                background: 'rgba(255,255,255,0.1)',
+                border: 'none',
+                color: 'white',
+                padding: '6px',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Download size={16} />
+            </button>
+          </div>
+        </div>
         <div
           style={{
             display: 'flex',
@@ -226,29 +271,13 @@ const ChannelList: React.FC<ChannelListProps> = ({
           </button>
         </div>
 
-        <div style={{ display: 'flex', gap: '5px' }}>
-          <input
-            type="file"
-            ref={fileInputRef}
-            style={{ display: 'none' }}
-            accept=".json"
-            onChange={handleImportFile}
-          />
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="action-btn secondary"
-            style={{ flex: 1 }}
-          >
-            <Upload size={16} style={{ marginRight: '5px' }} /> Import JSON
-          </button>
-          <button
-            onClick={handleExport}
-            className="action-btn secondary"
-            style={{ flex: 1 }}
-          >
-            <Download size={16} style={{ marginRight: '5px' }} /> Export
-          </button>
-        </div>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: 'none' }}
+          accept=".json"
+          onChange={handleImportFile}
+        />
       </div>
 
       <div
