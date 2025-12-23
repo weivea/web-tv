@@ -23,5 +23,9 @@ interface Window {
       lastWebSiteId?: string;
       lastActiveTab?: 'iptv' | 'webtv';
     }) => Promise<void>;
+    minimizeWindow: () => void;
+    maximizeWindow: () => void;
+    closeWindow: () => void;
+    toggleDevTools: () => void;
   };
 }

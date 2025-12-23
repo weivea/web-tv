@@ -1,0 +1,58 @@
+.title-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 32px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 9999;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none; /* Allow clicks to pass through the transparent parts if needed, but we need buttons to be clickable */
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.title-bar:hover {
+  opacity: 1;
+}
+
+.drag-region {
+  flex: 1;
+  height: 100%;
+  -webkit-app-region: drag;
+  pointer-events: auto; /* Capture drag events */
+}
+
+.window-controls {
+  display: flex;
+  -webkit-app-region: no-drag;
+  pointer-events: auto; /* Capture clicks on buttons */
+  padding-right: 8px;
+}
+
+.control-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.8);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  padding: 0;
+  border-radius: 0; /* Windows style usually square or slightly rounded */
+}
+
+.control-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.control-btn.close:hover {
+  background-color: #e81123;
+  color: #fff;
+}

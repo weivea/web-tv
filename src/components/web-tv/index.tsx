@@ -16,6 +16,7 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
       const selector = JSON.stringify(currentSite.cssSelector);
       const script = `
         (function() {
+          document.documentElement.style.overflow = 'hidden';
           const selector = ${selector};
           const check = () => {
             const el = document.querySelector(selector);

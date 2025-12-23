@@ -4,6 +4,7 @@ import Player from './components/Player';
 import ChannelList from './components/ChannelList';
 import WebList from './components/WebList';
 import WebTV from './components/web-tv';
+import TitleBar from './components/TitleBar';
 
 interface Channel {
   id: string;
@@ -153,6 +154,7 @@ function App() {
 
   return (
     <div className="app-container" onMouseMove={handleMouseMove}>
+      <TitleBar />
       <div className={`sidebar-layer ${isSidebarVisible ? '' : 'hidden'}`}>
         <div className="sidebar-tabs">
           <button

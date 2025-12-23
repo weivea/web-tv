@@ -78,10 +78,36 @@ let win: BrowserWindow | null;
 function createWindow() {
   win = new BrowserWindow({
     icon: path.join(process.env.VITE_PUBLIC, 'electron-vite.svg'),
+    frame: false, // Frameless window
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
     },
+  });
+
+  // Window controls
+  ipcMain.on('minimize-window', () => {
+    win?.minimize();
+  });
+
+  ipcMain.on('maximize-window', () => {
+    if (win?.isMaximized()) {
+      win?.unmaximize();
+    } else {
+      win?.maximize();
+    }
+  });
+
+  ipcMain.on('close-window', () => {
+    win?.close();
+  });
+
+  ipcMain.on('toggle-dev-tools', () => {
+    if (win?.webContents.isDevToolsOpened()) {
+      win?.webContents.closeDevTools();
+    } else {
+      win?.webContents.openDevTools();
+    }
   });
 
   // Test active push message to Renderer-process.

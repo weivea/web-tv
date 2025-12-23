@@ -29,26 +29,32 @@ This document provides context and guidelines for AI agents assisting with the d
     -   Entry point.
     -   **Critical**: Includes `app.on('certificate-error', ...)` to bypass SSL errors.
     -   **Configuration**: Enables `webviewTag: true` in `webPreferences` to support the Web TV feature.
+    -   **Window Management**: Configured as `frame: false` for a custom UI. Handles IPC events for window controls (`minimize`, `maximize`, `close`, `toggle-dev-tools`).
     -   Handles window creation and IPC setup for both Channels and Web Sites.
 
 2.  **`src/App.tsx`**:
-    -   **Layout**: Manages the main application layout including the sidebar and main content area.
+    -   **Layout**: Manages the main application layout including the sidebar, main content area, and the custom `TitleBar`.
     -   **State**: Manages `activeTab` ('iptv' | 'webtv'), `channels`, and `webSites`.
     -   **Drawer Logic**: Implements the auto-hiding sidebar (drawer) behavior.
 
-3.  **`src/components/Player.tsx`**:
+3.  **`src/components/TitleBar.tsx`**:
+    -   **Custom UI**: Implements a frameless window title bar with drag regions.
+    -   **Controls**: Provides Minimize, Maximize, Close, and Debug (DevTools) buttons.
+    -   **Behavior**: Auto-hides (opacity 0) and reveals on hover.
+
+4.  **`src/components/Player.tsx`**:
     -   Wraps `hls.js` for IPTV playback.
     -   **Error Handling**: Implements custom timeouts and error overlays.
 
-4.  **`src/components/ChannelList.tsx`**:
+5.  **`src/components/ChannelList.tsx`**:
     -   Manages the sidebar UI for IPTV channels.
     -   Handles M3U playlist imports.
 
-5.  **`src/components/WebList.tsx`**:
+6.  **`src/components/WebList.tsx`**:
     -   Manages the sidebar UI for Web TV sites.
     -   Allows adding/removing websites (Title + URL).
 
-6.  **`src/utils/m3uParser.ts`**:
+7.  **`src/utils/m3uParser.ts`**:
     -   Parses raw M3U text content.
     -   Extracts `#EXTINF` metadata (tvg-name, tvg-logo, group-title).
 

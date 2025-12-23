@@ -16,6 +16,10 @@ A modern, lightweight IPTV player built with Electron, React, and TypeScript. De
     - 15s timeout for playlist imports.
     - Configurable timeouts for HLS manifest/fragment loading.
   - **SSL Compatibility**: Automatically bypasses SSL certificate errors to support a wider range of streams.
+- **🎨 Modern UI**:
+  - **Frameless Design**: Custom title bar with a sleek, immersive look.
+  - **Auto-Hide Controls**: Title bar and window controls automatically fade out when not in use to maximize viewing area.
+  - **Web TV Mode**: Integrated browser view for navigating web-based streaming sites.
 - **⚡ Modern Tech Stack**: Built with Vite for lightning-fast development and build performance.
 
 ## Tech Stack
@@ -24,6 +28,7 @@ A modern, lightweight IPTV player built with Electron, React, and TypeScript. De
 - **Frontend**: [React](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - **Build Tool**: [Vite](https://vitejs.dev/)
 - **Player**: [hls.js](https://github.com/video-dev/hls.js)
+- **Icons**: [lucide-react](https://lucide.dev/)
 - **Storage**: [electron-store](https://github.com/sindresorhus/electron-store)
 
 ## Getting Started

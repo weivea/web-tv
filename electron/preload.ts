@@ -29,4 +29,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   saveWebSites: (sites: any) => ipcRenderer.invoke('save-web-sites', sites),
   getLastState: () => ipcRenderer.invoke('get-last-state'),
   saveLastState: (state: any) => ipcRenderer.invoke('save-last-state', state),
+
+  // Window Controls
+  minimizeWindow: () => ipcRenderer.send('minimize-window'),
+  maximizeWindow: () => ipcRenderer.send('maximize-window'),
+  closeWindow: () => ipcRenderer.send('close-window'),
+  toggleDevTools: () => ipcRenderer.send('toggle-dev-tools'),
 });

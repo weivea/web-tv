@@ -38,6 +38,8 @@ body {
   transition: transform 0.3s ease-in-out;
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.7);
   color: #e0e0e0;
+  padding-top: 32px; /* Space for TitleBar */
+  box-sizing: border-box;
 }
 
 .sidebar-layer.hidden {
