@@ -14,6 +14,7 @@ interface ChannelListProps {
   onAdd: (channel: Channel) => void;
   onImport: (channels: Channel[]) => void;
   onDelete: (id: string) => void;
+  onClear: () => void;
 }
 
 const ChannelList: React.FC<ChannelListProps> = ({
@@ -23,6 +24,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
   onAdd,
   onImport,
   onDelete,
+  onClear,
 }) => {
   const [newUrl, setNewUrl] = useState('');
   const [newName, setNewName] = useState('');
@@ -37,13 +39,14 @@ const ChannelList: React.FC<ChannelListProps> = ({
       try {
         setIsImporting(true);
 
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000); // 15s timeout
-
         try {
-          const response = await fetch(newUrl, { signal: controller.signal });
-          clearTimeout(timeoutId);
-          const text = await response.text();
+          // Use IPC to fetch to avoid CORS issues
+          const text = await Promise.race([
+            window.ipcRenderer.fetchUrl(newUrl),
+            new Promise<string>((_, reject) =>
+              setTimeout(() => reject(new Error('Timeout')), 15000),
+            ),
+          ]);
 
           if (text.includes('#EXTM3U')) {
             const parsedChannels = parseM3U(text);
@@ -62,7 +65,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
             }
           }
         } catch (fetchError) {
-          if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          if (fetchError instanceof Error && fetchError.message === 'Timeout') {
             alert('Import timed out after 15 seconds');
           } else {
             throw fetchError;
@@ -119,11 +122,28 @@ const ChannelList: React.FC<ChannelListProps> = ({
           />
           <button
             onClick={handleAdd}
-            style={{ width: '100%' }}
+            style={{ width: '100%', marginBottom: '5px' }}
             disabled={isImporting}
           >
             {isImporting ? 'Importing...' : 'Add / Import URL'}
           </button>
+          {channels.length > 0 && (
+            <button
+              onClick={() => {
+                if (confirm('Are you sure you want to clear all channels?')) {
+                  onClear();
+                }
+              }}
+              style={{
+                width: '100%',
+                backgroundColor: '#ef4444',
+                color: 'white',
+                border: 'none',
+              }}
+            >
+              Clear All
+            </button>
+          )}
         </div>
       </div>
       <div

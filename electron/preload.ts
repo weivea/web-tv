@@ -29,6 +29,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
   saveWebSites: (sites: any) => ipcRenderer.invoke('save-web-sites', sites),
   getLastState: () => ipcRenderer.invoke('get-last-state'),
   saveLastState: (state: any) => ipcRenderer.invoke('save-last-state', state),
+  fetchUrl: (url: string) => ipcRenderer.invoke('fetch-url', url),
 
   // Window Controls
   minimizeWindow: () => ipcRenderer.send('minimize-window'),

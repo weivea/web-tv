@@ -82,6 +82,11 @@ npm run build
    - Click on any channel in the list to start playing.
    - If a stream fails to start within 10 seconds, an error message will appear.
 
+## IPTV 直播源获取
+https://iptv.hacks.tools/
+
+
+
 ## License
 
 MIT

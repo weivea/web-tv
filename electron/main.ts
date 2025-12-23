@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain } from 'electron'
+import { app, BrowserWindow, ipcMain, net } from 'electron'
 import { createRequire } from 'node:module'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
@@ -69,6 +69,34 @@ ipcMain.handle('save-last-state', (_event, state) => {
     store.set('lastWebSiteId', state.lastWebSiteId);
   if (state.lastActiveTab !== undefined)
     store.set('lastActiveTab', state.lastActiveTab);
+});
+
+ipcMain.handle('fetch-url', async (_event, url) => {
+  return new Promise((resolve, reject) => {
+    let requestUrl = url;
+    try {
+      requestUrl = new URL(url).toString();
+    } catch (e) {
+      // invalid url, let net.request handle it or fail
+    }
+    const request = net.request(requestUrl);
+    request.on('response', (response) => {
+      let data = '';
+      response.on('data', (chunk) => {
+        data += chunk.toString();
+      });
+      response.on('end', () => {
+        resolve(data);
+      });
+      response.on('error', (error: Error) => {
+        reject(error);
+      });
+    });
+    request.on('error', (error: Error) => {
+      reject(error);
+    });
+    request.end();
+  });
 });
 
 let win: BrowserWindow | null;

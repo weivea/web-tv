@@ -23,6 +23,7 @@ interface Window {
       lastWebSiteId?: string;
       lastActiveTab?: 'iptv' | 'webtv';
     }) => Promise<void>;
+    fetchUrl: (url: string) => Promise<string>;
     minimizeWindow: () => void;
     maximizeWindow: () => void;
     closeWindow: () => void;

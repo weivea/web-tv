@@ -128,6 +128,12 @@ function App() {
     }
   };
 
+  const handleClearChannels = () => {
+    setChannels([]);
+    window.ipcRenderer.saveChannels([]);
+    setCurrentChannel(null);
+  };
+
   // Web Site Handlers
   const handleAddWebSite = (site: Channel) => {
     const newSites = [...webSites, site];
@@ -198,6 +204,7 @@ function App() {
               onAdd={handleAddChannel}
               onImport={handleImportChannels}
               onDelete={handleDeleteChannel}
+              onClear={handleClearChannels}
             />
           ) : (
             <WebList
