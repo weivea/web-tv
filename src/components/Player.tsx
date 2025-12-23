@@ -60,7 +60,15 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
 
     video.addEventListener('error', handleVideoError);
 
-    if (Hls.isSupported()) {
+    let isDirectStream = false;
+    try {
+      const u = new URL(url);
+      isDirectStream = /\.(mp4|webm|ogg|mov|mkv)$/i.test(u.pathname);
+    } catch (e) {
+      isDirectStream = /\.(mp4|webm|ogg|mov|mkv)($|\?)/i.test(url);
+    }
+
+    if (!isDirectStream && Hls.isSupported()) {
       hls = new Hls({
         manifestLoadingTimeOut: 15000, // 15s timeout for manifest loading
         manifestLoadingMaxRetry: 2, // Max 2 retries
@@ -91,7 +99,13 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
           }
         }
       });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    } else if (!isDirectStream && video.canPlayType('application/vnd.apple.mpegurl')) {
+      video.src = url;
+      video.addEventListener('loadedmetadata', () => {
+        video.play().catch((e) => console.error('Error playing video:', e));
+      });
+    } else {
+      // Direct playback for MP4 or other supported formats
       video.src = url;
       video.addEventListener('loadedmetadata', () => {
         video.play().catch((e) => console.error('Error playing video:', e));
