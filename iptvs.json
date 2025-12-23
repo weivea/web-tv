@@ -62,5 +62,17 @@
   {
     "name": "解说频道",
     "url": "https://live.hacks.tools/tv/ipv4/categories/解说频道.m3u"
+  },
+  {
+    "name": "香港频道",
+    "url": "https://live.hacks.tools/tv/ipv4/categories/hong_kong.m3u"
+  },
+  {
+    "name": "澳门频道",
+    "url": "https://live.hacks.tools/tv/ipv4/categories/macau.m3u"
+  },
+  {
+    "name": "台湾频道",
+    "url": "https://live.hacks.tools/tv/ipv4/categories/taiwan.m3u"
   }
 ]
