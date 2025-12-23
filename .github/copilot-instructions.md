@@ -4,7 +4,7 @@ This document provides context and guidelines for AI agents assisting with the d
 
 ## Project Overview
 **Web TV** is a desktop application built with Electron, React, and TypeScript. It features two main modes:
-1.  **IPTV Player**: Plays HLS (`.m3u8`) streams and manages M3U playlists.
+1.  **IPTV Player**: Manages multiple M3U playlists and plays HLS (`.m3u8`) streams.
 2.  **Web TV**: Browses user-configured websites using an embedded browser view.
 
 ## Tech Stack & Constraints
@@ -21,7 +21,9 @@ This document provides context and guidelines for AI agents assisting with the d
 ### Directory Structure
 - `electron/`: Contains the Main process code (`main.ts`) and Preload scripts (`preload.ts`).
 - `src/`: React Renderer process code.
-  - `components/`: UI components (`Player.tsx`, `ChannelList.tsx`, `WebList.tsx`).
+  - `components/`: UI components.
+    - `web-tv/`: Contains the Web TV implementation (`index.tsx`).
+    - `Player.tsx`, `ChannelList.tsx`, `WebList.tsx`, `TitleBar.tsx`.
   - `utils/`: Helper functions (`m3uParser.ts`).
 
 ### Key Components
@@ -30,11 +32,16 @@ This document provides context and guidelines for AI agents assisting with the d
     -   **Critical**: Includes `app.on('certificate-error', ...)` to bypass SSL errors.
     -   **Configuration**: Enables `webviewTag: true` in `webPreferences` to support the Web TV feature.
     -   **Window Management**: Configured as `frame: false` for a custom UI. Handles IPC events for window controls (`minimize`, `maximize`, `close`, `toggle-dev-tools`).
-    -   Handles window creation and IPC setup for both Channels and Web Sites.
+    -   Handles window creation and IPC setup for Playlists, Channels, and Web Sites.
 
 2.  **`src/App.tsx`**:
     -   **Layout**: Manages the main application layout including the sidebar, main content area, and the custom `TitleBar`.
-    -   **State**: Manages `activeTab` ('iptv' | 'webtv'), `channels`, and `webSites`.
+    -   **State**: 
+        -   `activeTab`: 'iptv' | 'webtv'
+        -   `playlists`: List of managed playlists.
+        -   `currentPlaylist`: Currently selected playlist.
+        -   `playlistChannels`: Channels within the current playlist.
+        -   `webSites`: List of Web TV sites.
     -   **Drawer Logic**: Implements the auto-hiding sidebar (drawer) behavior.
 
 3.  **`src/components/TitleBar.tsx`**:
@@ -47,14 +54,19 @@ This document provides context and guidelines for AI agents assisting with the d
     -   **Error Handling**: Implements custom timeouts and error overlays.
 
 5.  **`src/components/ChannelList.tsx`**:
-    -   Manages the sidebar UI for IPTV channels.
-    -   Handles M3U playlist imports.
+    -   Manages the sidebar UI for IPTV.
+    -   **Views**: Switches between 'playlists' (list of M3U sources) and 'channels' (channels in selected playlist).
+    -   Handles adding/importing playlists and selecting channels.
 
 6.  **`src/components/WebList.tsx`**:
     -   Manages the sidebar UI for Web TV sites.
     -   Allows adding/removing websites (Title + URL).
 
-7.  **`src/utils/m3uParser.ts`**:
+7.  **`src/components/web-tv/index.tsx`**:
+    -   **Web View Wrapper**: Wraps the Electron `webview` tag.
+    -   **Lifecycle Management**: Handles muting/unmuting and pausing/playing media via `executeJavaScript` when switching tabs.
+
+8.  **`src/utils/m3uParser.ts`**:
     -   Parses raw M3U text content.
     -   Extracts `#EXTINF` metadata (tvg-name, tvg-logo, group-title).
 
@@ -70,8 +82,8 @@ The project is designed to be compatible with **Node.js v16**.
 -   **SSL**: The app is configured to be permissive with SSL errors to maximize stream compatibility.
 
 ### 3. State Management
--   Persistent data (channels) is stored using `electron-store`.
--   Runtime state (current channel, UI toggle) is managed via React `useState`.
+-   Persistent data (playlists, web sites) is stored using `electron-store`.
+-   Runtime state (current playlist, current channel) is managed via React `useState`.
 
 ### 4. IPC Communication
 -   Use `contextBridge` in `preload.ts` to expose safe APIs to the renderer.
@@ -82,7 +94,7 @@ The project is designed to be compatible with **Node.js v16**.
 
 ### 6. Coding Standards
 -   **Readability**: Prioritize clear, self-documenting code. Use meaningful variable/function names over comments. Avoid deep nesting by using early returns.
--   **Data Flow**: Maintain clear, unidirectional data flow (Parent -> Child). Explicitly define state ownership (e.g., `App.tsx` owns the channel list state).
+-   **Data Flow**: Maintain clear, unidirectional data flow (Parent -> Child). Explicitly define state ownership (e.g., `App.tsx` owns the playlist state).
 -   **Component Architecture**:
     -   **Splitting**: Break down large components into smaller, focused sub-components with single responsibilities.
     -   **Separation**: Keep UI rendering separate from heavy business logic or data transformation.

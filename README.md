@@ -6,9 +6,9 @@ A modern, lightweight IPTV player built with Electron, React, and TypeScript. De
 
 - **📺 HLS Streaming**: Native support for `.m3u8` live streams using `hls.js`.
 - **📋 Playlist Management**:
-  - **Add Single Channel**: Manually add channels by Name and URL.
-  - **Bulk Import**: Import entire M3U playlists from URLs (supports `#EXTM3U` format).
-  - **Persistence**: Your channel list is automatically saved and restored (using `electron-store`).
+  - **Multiple Playlists**: Organize channels into separate playlists.
+  - **Import**: Add playlists from URLs (supports `#EXTM3U` format).
+  - **Persistence**: Playlists and channels are automatically saved and restored.
 - **🛡️ Robust Playback**:
   - **Error Handling**: Visual feedback for network errors or unsupported streams.
   - **Timeout Protection**: 
@@ -69,17 +69,17 @@ npm run build
 
 ## Usage
 
-1. **Add a Channel**:
-   - Enter a Name and an `.m3u8` URL in the sidebar inputs.
-   - Click "Add / Import URL".
+1. **Manage Playlists**:
+   - In the sidebar, click "+" to add a new playlist.
+   - Enter a Name and URL for the playlist (M3U/M3U8).
+   - Click "Add" to save.
 
-2. **Import a Playlist**:
-   - Paste a URL pointing to an `.m3u` or `.m3u8` playlist file (e.g., from GitHub).
-   - Click "Add / Import URL".
-   - The app will automatically parse and add all valid channels.
+2. **Browse Channels**:
+   - Click on a playlist to view its channels.
+   - Click "Back" to return to the playlist list.
 
 3. **Play**:
-   - Click on any channel in the list to start playing.
+   - Click on any channel to start playing.
    - If a stream fails to start within 10 seconds, an error message will appear.
 
 ## IPTV 直播源获取
