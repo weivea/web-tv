@@ -31,15 +31,16 @@ body {
   top: 0;
   left: 0;
   height: 100%;
-  width: 280px;
+  width: 40vh; /* Proportional to height */
   background-color: rgba(20, 20, 20, 0.5); /* Dark semi-transparent */
   backdrop-filter: blur(8px);
   z-index: 10;
   transition: transform 0.3s ease-in-out;
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.7);
   color: #e0e0e0;
-  padding-top: 32px; /* Space for TitleBar */
+  padding-top: 5vh; /* Space for TitleBar */
   box-sizing: border-box;
+  font-size: 2.2vh; /* Base font size */
 }
 
 .sidebar-layer.hidden {
@@ -51,10 +52,12 @@ body {
   background: rgba(255, 255, 255, 0.1);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: white;
-  padding: 8px;
-  border-radius: 4px;
+  padding: 1vh;
+  border-radius: 0.5vh;
   width: 100%;
   box-sizing: border-box;
+  font-size: 2vh;
+  margin-bottom: 1vh;
 }
 
 .sidebar-layer input::placeholder {
@@ -63,22 +66,23 @@ body {
 
 .sidebar-layer h3 {
   margin-top: 0;
-  padding-top: 10px;
+  padding-top: 1.5vh;
   color: #fff;
   border-bottom: 1px solid rgba(255,255,255,0.1);
-  padding-bottom: 10px;
+  padding-bottom: 1.5vh;
+  font-size: 2.5vh;
 }
 
 /* Scrollbar styling for sidebar */
 .sidebar-layer .channel-scroll-area::-webkit-scrollbar {
-  width: 4px;
+  width: 0.5vh;
 }
 .sidebar-layer .channel-scroll-area::-webkit-scrollbar-track {
   background: transparent;
 }
 .sidebar-layer .channel-scroll-area::-webkit-scrollbar-thumb {
   background: rgba(255, 255, 255, 0.15);
-  border-radius: 2px;
+  border-radius: 0.25vh;
 }
 .sidebar-layer .channel-scroll-area::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
@@ -87,40 +91,41 @@ body {
 /* Channel Item Styles */
 .channel-item {
   box-sizing: border-box;
-  margin-bottom: 5px;
-  padding: 10px 12px;
+  margin-bottom: 0.8vh;
+  padding: 1.5vh 2vh;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   display: flex;
   justify-content: space-between;
   align-items: center;
   cursor: pointer;
-  border-radius: 6px;
+  border-radius: 1vh;
   transition: all 0.2s ease;
   color: rgba(255, 255, 255, 0.7);
+  font-size: 2.2vh;
 }
 
 .channel-item:hover {
   background-color: rgba(255, 255, 255, 0.1);
   color: #fff;
-  transform: translateX(4px);
+  transform: translateX(0.5vh);
 }
 
 .channel-item.selected {
   background-color: rgba(100, 108, 255, 0.2); /* Brand color tint */
-  border-left: 3px solid #646cff;
+  border-left: 0.5vh solid #646cff;
   color: #fff;
   font-weight: 500;
 }
 
 .channel-item .delete-btn {
-  margin-left: 8px;
+  margin-left: 1vh;
   background: transparent;
   color: rgba(255, 255, 255, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.1);
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.8em;
+  padding: 0.5vh 1vh;
+  border-radius: 0.5vh;
+  font-size: 1.8vh;
   transition: all 0.2s;
   opacity: 0; /* Hide by default */
 }
@@ -145,11 +150,12 @@ body {
   background: transparent;
   border: none;
   color: rgba(255, 255, 255, 0.5);
-  padding: 12px;
+  padding: 1.5vh;
   cursor: pointer;
   font-weight: bold;
   transition: all 0.2s;
-  border-bottom: 2px solid transparent;
+  border-bottom: 0.3vh solid transparent;
+  font-size: 2.2vh;
 }
 
 .tab-btn:hover {
@@ -159,12 +165,12 @@ body {
 
 .tab-btn.active {
   color: #4a9eff;
-  border-bottom: 2px solid #4a9eff;
+  border-bottom: 0.3vh solid #4a9eff;
   background: rgba(74, 158, 255, 0.1);
 }
 
 .sidebar-content {
-  height: calc(100% - 45px); /* Adjust based on tab height */
+  height: calc(100% - 6vh); /* Adjust based on tab height */
   overflow: hidden;
 }
 
@@ -174,7 +180,7 @@ body {
   justify-content: center;
   align-items: center;
   height: 100%;
-  font-size: 1.2em;
+  font-size: 3vh;
   opacity: 0.7;
 }
 

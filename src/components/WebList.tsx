@@ -129,7 +129,7 @@ const WebList: React.FC<WebListProps> = ({
     <div
       className="channel-list"
       style={{
-        padding: '10px',
+        padding: '1vh',
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
@@ -141,11 +141,11 @@ const WebList: React.FC<WebListProps> = ({
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '10px',
+            marginBottom: '1vh',
           }}
         >
           <h3 style={{ margin: 0 }}>Web Sites</h3>
-          <div style={{ display: 'flex', gap: '5px' }}>
+          <div style={{ display: 'flex', gap: '0.5vh' }}>
             <button
               onClick={handleImportClick}
               title="Import JSON"
@@ -153,15 +153,15 @@ const WebList: React.FC<WebListProps> = ({
                 background: 'rgba(255,255,255,0.1)',
                 border: 'none',
                 color: 'white',
-                padding: '6px',
-                borderRadius: '4px',
+                padding: '0.6vh',
+                borderRadius: '0.4vh',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Upload size={16} />
+              <Upload size="1.6vh" />
             </button>
             <button
               onClick={handleExport}
@@ -170,15 +170,15 @@ const WebList: React.FC<WebListProps> = ({
                 background: 'rgba(255,255,255,0.1)',
                 border: 'none',
                 color: 'white',
-                padding: '6px',
-                borderRadius: '4px',
+                padding: '0.6vh',
+                borderRadius: '0.4vh',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Download size={16} />
+              <Download size="1.6vh" />
             </button>
           </div>
         </div>
@@ -189,29 +189,29 @@ const WebList: React.FC<WebListProps> = ({
           accept=".json"
           onChange={handleFileChange}
         />
-        <div style={{ marginBottom: '10px' }}>
+        <div style={{ marginBottom: '1vh' }}>
           <input
             type="text"
             placeholder="Site Name"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            style={{ marginBottom: '5px' }}
+            style={{ marginBottom: '0.5vh' }}
           />
           <input
             type="text"
             placeholder="URL (https://...)"
             value={newUrl}
             onChange={(e) => setNewUrl(e.target.value)}
-            style={{ marginBottom: '5px' }}
+            style={{ marginBottom: '0.5vh' }}
           />
           <input
             type="text"
             placeholder="Full Screen CSS Selector (Optional)"
             value={newCssSelector}
             onChange={(e) => setNewCssSelector(e.target.value)}
-            style={{ marginBottom: '5px' }}
+            style={{ marginBottom: '0.5vh' }}
           />
-          <button onClick={handleAdd} style={{ width: '100%' }}>
+          <button onClick={handleAdd} style={{ width: '100%', padding: '1vh', fontSize: '1.6vh' }}>
             Add Website
           </button>
         </div>

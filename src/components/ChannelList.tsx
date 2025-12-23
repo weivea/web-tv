@@ -116,11 +116,11 @@ const ChannelList: React.FC<ChannelListProps> = ({
       >
         <div
           style={{
-            padding: '10px',
+            padding: '1vh',
             borderBottom: '1px solid #333',
             display: 'flex',
             alignItems: 'center',
-            gap: '10px',
+            gap: '1vh',
           }}
         >
           <button
@@ -137,12 +137,12 @@ const ChannelList: React.FC<ChannelListProps> = ({
               cursor: 'pointer',
             }}
           >
-            <ArrowLeft size={20} />
+            <ArrowLeft size="2vh" />
           </button>
           <h3
             style={{
               margin: 0,
-              fontSize: '16px',
+              fontSize: '2vh',
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap',
@@ -157,9 +157,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
           style={{ flexGrow: 1, overflowY: 'auto', overflowX: 'hidden' }}
         >
           {channels.length === 0 ? (
-            <div
-              style={{ padding: '20px', textAlign: 'center', color: '#888' }}
-            >
+            <div style={{ padding: '2vh', textAlign: 'center', color: '#888' }}>
               Loading channels...
             </div>
           ) : (
@@ -173,7 +171,7 @@ const ChannelList: React.FC<ChannelListProps> = ({
                   onClick={() => onSelectChannel(channel)}
                 >
                   <span style={{ flexGrow: 1 }}>{channel.name}</span>
-                  {selectedChannelId === channel.id && <Play size={14} />}
+                  {selectedChannelId === channel.id && <Play size="1.4vh" />}
                 </li>
               ))}
             </ul>
@@ -190,20 +188,20 @@ const ChannelList: React.FC<ChannelListProps> = ({
         height: '100%',
         display: 'flex',
         flexDirection: 'column',
-        padding: '10px',
+        padding: '1vh',
       }}
     >
-      <div style={{ marginBottom: '15px' }}>
+      <div style={{ marginBottom: '1.5vh' }}>
         <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            marginBottom: '10px',
+            marginBottom: '1vh',
           }}
         >
           <h3 style={{ margin: 0 }}>Playlists</h3>
-          <div style={{ display: 'flex', gap: '5px' }}>
+          <div style={{ display: 'flex', gap: '0.5vh' }}>
             <button
               onClick={() => fileInputRef.current?.click()}
               title="Import JSON"
@@ -211,15 +209,15 @@ const ChannelList: React.FC<ChannelListProps> = ({
                 background: 'rgba(255,255,255,0.1)',
                 border: 'none',
                 color: 'white',
-                padding: '6px',
-                borderRadius: '4px',
+                padding: '0.6vh',
+                borderRadius: '0.4vh',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Upload size={16} />
+              <Upload size="1.6vh" />
             </button>
             <button
               onClick={handleExport}
@@ -228,15 +226,15 @@ const ChannelList: React.FC<ChannelListProps> = ({
                 background: 'rgba(255,255,255,0.1)',
                 border: 'none',
                 color: 'white',
-                padding: '6px',
-                borderRadius: '4px',
+                padding: '0.6vh',
+                borderRadius: '0.4vh',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Download size={16} />
+              <Download size="1.6vh" />
             </button>
           </div>
         </div>
@@ -244,8 +242,8 @@ const ChannelList: React.FC<ChannelListProps> = ({
           style={{
             display: 'flex',
             flexDirection: 'column',
-            gap: '5px',
-            marginBottom: '10px',
+            gap: '0.5vh',
+            marginBottom: '1vh',
           }}
         >
           <input
@@ -266,8 +264,16 @@ const ChannelList: React.FC<ChannelListProps> = ({
             onClick={handleAdd}
             className="action-btn primary"
             disabled={!newPlaylistName || !newPlaylistUrl}
+            style={{
+              padding: '1vh',
+              fontSize: '1.6vh',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '0.5vh',
+            }}
           >
-            <Plus size={16} style={{ marginRight: '5px' }} /> Add Playlist
+            <Plus size="1.6vh" style={{ marginRight: '0.5vh' }} /> Add Playlist
           </button>
         </div>
 
@@ -304,15 +310,13 @@ const ChannelList: React.FC<ChannelListProps> = ({
                 }}
                 className="delete-btn"
               >
-                <Trash2 size={14} />
+                <Trash2 size="1.4vh" />
               </button>
             </li>
           ))}
         </ul>
         {playlists.length === 0 && (
-          <div
-            style={{ textAlign: 'center', color: '#888', marginTop: '20px' }}
-          >
+          <div style={{ textAlign: 'center', color: '#888', marginTop: '2vh' }}>
             No playlists added.
           </div>
         )}
