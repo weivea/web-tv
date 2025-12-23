@@ -32,6 +32,7 @@ This document provides context and guidelines for AI agents assisting with the d
     -   **Critical**: Includes `app.on('certificate-error', ...)` to bypass SSL errors.
     -   **Configuration**: Enables `webviewTag: true` in `webPreferences` to support the Web TV feature.
     -   **Window Management**: Configured as `frame: false` for a custom UI. Handles IPC events for window controls (`minimize`, `maximize`, `close`, `toggle-dev-tools`).
+    -   **CORS Handling**: Uses `webSecurity: false` in `webPreferences` to globally disable CORS checks for the renderer process, ensuring maximum compatibility with IPTV streams.
     -   Handles window creation and IPC setup for Playlists, Channels, and Web Sites.
 
 2.  **`src/App.tsx`**:

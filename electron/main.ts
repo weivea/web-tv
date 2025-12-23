@@ -122,6 +122,7 @@ function createWindow() {
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       webviewTag: true,
+      webSecurity: false, // Disable web security to allow CORS
     },
   });
 

@@ -24,27 +24,35 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
       }
     };
 
-    // Set 10s timeout
+    // Set 15s timeout
     playbackTimeout = window.setTimeout(() => {
-      setError("Playback timeout: Channel failed to start within 10 seconds.");
+      setError('Playback timeout: Channel failed to start within 15 seconds.');
       if (hls) {
         hls.destroy();
         hls = null;
       }
-    }, 10000);
+    }, 15000);
 
     video.addEventListener('playing', handlePlaybackStart);
 
     const handleVideoError = () => {
       if (playbackTimeout) clearTimeout(playbackTimeout);
       const err = video.error;
-      let message = "Unknown playback error";
+      let message = 'Unknown playback error';
       if (err) {
         switch (err.code) {
-          case MediaError.MEDIA_ERR_ABORTED: message = "Playback aborted"; break;
-          case MediaError.MEDIA_ERR_NETWORK: message = "Network error"; break;
-          case MediaError.MEDIA_ERR_DECODE: message = "Decode error"; break;
-          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED: message = "Source not supported"; break;
+          case MediaError.MEDIA_ERR_ABORTED:
+            message = 'Playback aborted';
+            break;
+          case MediaError.MEDIA_ERR_NETWORK:
+            message = 'Network error';
+            break;
+          case MediaError.MEDIA_ERR_DECODE:
+            message = 'Decode error';
+            break;
+          case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+            message = 'Source not supported';
+            break;
         }
       }
       setError(message);
@@ -55,25 +63,25 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
     if (Hls.isSupported()) {
       hls = new Hls({
         manifestLoadingTimeOut: 15000, // 15s timeout for manifest loading
-        manifestLoadingMaxRetry: 2,    // Max 2 retries
-        levelLoadingTimeOut: 15000,    // 15s timeout for level loading
-        fragLoadingTimeOut: 20000,     // 20s timeout for fragment loading
+        manifestLoadingMaxRetry: 2, // Max 2 retries
+        levelLoadingTimeOut: 15000, // 15s timeout for level loading
+        fragLoadingTimeOut: 20000, // 20s timeout for fragment loading
       });
       hls.loadSource(url);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, () => {
-        video.play().catch(e => console.error("Error playing video:", e));
+        video.play().catch((e) => console.error('Error playing video:', e));
       });
 
       hls.on(Hls.Events.ERROR, (_event, data) => {
         if (data.fatal) {
           switch (data.type) {
             case Hls.ErrorTypes.NETWORK_ERROR:
-              console.error("fatal network error encountered, try to recover");
+              console.error('fatal network error encountered, try to recover');
               hls?.startLoad();
               break;
             case Hls.ErrorTypes.MEDIA_ERROR:
-              console.error("fatal media error encountered, try to recover");
+              console.error('fatal media error encountered, try to recover');
               hls?.recoverMediaError();
               break;
             default:
@@ -86,7 +94,7 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
     } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = url;
       video.addEventListener('loadedmetadata', () => {
-        video.play().catch(e => console.error("Error playing video:", e));
+        video.play().catch((e) => console.error('Error playing video:', e));
       });
     }
 
