@@ -278,5 +278,50 @@
     "name": "中国教育电视台1频道",
     "url": "https://www.yangshipin.cn/tv/home?pid=600171827",
     "cssSelector": ".tv-main-con-l-vid > div"
+  },
+  {
+    "name": "浙江-钱江都市",
+    "url": "https://www.cztv.com/liveTV/102",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-经济生活",
+    "url": "https://www.cztv.com/liveTV/103",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-科教影视",
+    "url": "https://www.cztv.com/liveTV/104",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-民生休闲",
+    "url": "https://www.cztv.com/liveTV/106",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-新闻",
+    "url": "https://www.cztv.com/liveTV/107",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-少儿频道",
+    "url": "https://www.cztv.com/liveTV/108",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-浙江国际",
+    "url": "https://www.cztv.com/liveTV/110",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-好易购",
+    "url": "https://www.cztv.com/liveTV/111",
+    "cssSelector": ".main_box > .content > .show .videoKS"
+  },
+  {
+    "name": "浙江-之江记录",
+    "url": "https://www.cztv.com/liveTV/112",
+    "cssSelector": ".main_box > .content > .show .videoKS"
   }
 ]

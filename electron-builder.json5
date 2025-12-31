@@ -4,7 +4,6 @@
   "appId": "com.webtv.app",
   "asar": true,
   "productName": "Web TV",
-  "icon": "public/icon.svg",
   "directories": {
     "output": "release/${version}"
   },

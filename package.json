@@ -1,5 +1,7 @@
 {
   "name": "web-tv",
+  "description": "A desktop application for IPTV and Web TV",
+  "author": "Web TV Team",
   "private": true,
   "version": "0.0.0",
   "scripts": {

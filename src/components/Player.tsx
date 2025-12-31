@@ -52,7 +52,7 @@ const Player: React.FC<PlayerProps> = ({ url }) => {
         flvPlayer.destroy();
         flvPlayer = null;
       }
-    }, 15000);
+    }, 20000);
 
     video.addEventListener('playing', handlePlaybackStart);
     video.addEventListener('waiting', handleWaiting);

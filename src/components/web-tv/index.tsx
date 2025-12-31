@@ -50,18 +50,40 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
       const selector = JSON.stringify(currentSite.cssSelector);
       const script = `
         (function() {
-          document.documentElement.style.overflow = 'hidden';
           const selector = ${selector};
+          const style = document.createElement('style');
+          style.textContent = \`
+            html, body {
+              overflow: hidden !important;
+            }
+            \${selector} {
+              position: fixed !important;
+              z-index: 10400 !important;
+              left: 0 !important;
+              top: 0 !important;
+              width: 100% !important;
+              height: 100% !important;
+              background: #000 !important;
+            }
+          \`;
+          document.head.appendChild(style);
+        })();
+      `;
+      webview
+        .executeJavaScript(script)
+        .catch((err: unknown) =>
+          console.error('Failed to inject CSS script', err),
+        );
+    };
+    const playVideo = () => {
+      const script = `
+        (function() {
           const check = () => {
-            const el = document.querySelector(selector);
-            if (el) {
-              el.style.position = 'fixed';
-              el.style.zIndex = '10400';
-              el.style.left = '0';
-              el.style.top = '0';
-              el.style.width = '100%';
-              el.style.height = '100%';
-              el.style.background = '#000';
+            const mediaElements = document.querySelectorAll('video, audio');
+            if (mediaElements.length > 0) {
+              mediaElements.forEach(el => {
+                el.play().catch(() => {});
+              });
             } else {
               setTimeout(check, 200);
             }
@@ -72,14 +94,16 @@ const WebTV = ({ isActive, currentSite }: WebTVProps) => {
       webview
         .executeJavaScript(script)
         .catch((err: unknown) =>
-          console.error('Failed to inject CSS script', err),
+          console.error('Failed to play media elements', err),
         );
     };
     webview.addEventListener('dom-ready', injectCss);
+    webview.addEventListener('dom-ready', playVideo);
 
     return () => {
       try {
         webview.removeEventListener('dom-ready', injectCss);
+        webview.removeEventListener('dom-ready', playVideo);
       } catch (e) {
         // Ignore errors if webview is destroyed
       }
