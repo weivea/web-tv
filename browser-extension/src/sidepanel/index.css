@@ -5,22 +5,212 @@ body {
   min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   background-color: #1a1a1a;
-  color: #ffffff;
+  color: #e0e0e0;
+  font-size: 14px;
 }
 
+/* Header */
+.header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(26, 26, 26, 0.95);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+h1 {
+  font-size: 16px;
+  margin: 0;
+  color: #fff;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* Inputs */
+input[type="text"] {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: white;
+  padding: 10px;
+  border-radius: 6px;
+  width: 100%;
+  box-sizing: border-box;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input[type="text"]:focus {
+  border-color: #646cff;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+/* Common Button Styles */
 button {
   cursor: pointer;
+  border: none;
+  background: transparent;
+  color: #aaa;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  padding: 6px;
 }
 
-input {
-  background-color: #2a2a2a;
-  border: 1px solid #3a3a3a;
+button:hover {
   color: #fff;
-  padding: 8px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Primary Action Button */
+.primary-btn {
+  background: #646cff;
+  color: white;
+  width: 100%;
+  padding: 10px;
+  font-weight: 500;
+  margin-top: 16px;
+  border-radius: 6px;
+}
+
+.primary-btn:hover {
+  background: #747bff;
+}
+
+.icon-btn-group {
+    display: flex;
+    gap: 4px;
+}
+
+/* Channel List */
+.list-container {
+    padding: 8px;
+}
+
+.channel-item {
+  box-sizing: border-box;
+  margin-bottom: 4px;
+  padding: 10px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 14px;
+  border-left: 3px solid transparent;
+  background: transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.channel-item:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  transform: translateX(2px);
+}
+
+.channel-item.selected {
+  background-color: rgba(100, 108, 255, 0.15);
+  border-left: 3px solid #646cff;
+  color: #fff;
+  font-weight: 500;
+}
+
+.channel-info {
+    flex: 1;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.channel-name {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.channel-url {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Delete Button */
+.delete-btn {
+  margin-left: 8px;
+  color: rgba(255, 255, 255, 0.3);
+  padding: 6px;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: all 0.2s;
+}
+
+/* Only show delete button on hover or if it's focused */
+.channel-item:hover .delete-btn {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.delete-btn:hover {
+  background: rgba(255, 80, 80, 0.2);
+  color: #ff5555;
+}
+
+/* Add Form */
+.add-form {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.helper-text {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: -8px;
+    margin-left: 2px;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 32px;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
-
-input:focus {
-  outline: none;
-  border-color: #646cff;
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }

@@ -13,6 +13,7 @@ const App = () => {
   const [sites, setSites] = useState<WebSiteConfig[]>([]);
   const [newSite, setNewSite] = useState<Partial<WebSiteConfig>>({});
   const [activeTab, setActiveTab] = useState<'list' | 'add'>('list');
+  const [activeChannelId, setActiveChannelId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -21,13 +22,18 @@ const App = () => {
 
   const loadSites = async () => {
     if (typeof chrome !== 'undefined' && chrome.storage) {
-      const result = await chrome.storage.local.get('webTvSites');
+      const result = await chrome.storage.local.get(['webTvSites', 'webTvChannelId']);
       if (result.webTvSites) {
         setSites(result.webTvSites);
+      }
+      if (result.webTvChannelId) {
+        setActiveChannelId(result.webTvChannelId);
       }
     } else {
       const saved = localStorage.getItem('webTvSites');
       if (saved) setSites(JSON.parse(saved));
+      const savedId = localStorage.getItem('webTvChannelId');
+      if (savedId) setActiveChannelId(savedId);
     }
   };
 
@@ -71,11 +77,20 @@ const App = () => {
     await saveSites(updated);
   };
 
-  const handleOpen = async (url: string) => {
-    let target = url;
-    if (!url.startsWith('http')) {
-      target = 'https://' + url;
+  const handleOpen = async (siteConfig: WebSiteConfig) => {
+    let target = siteConfig.urlPattern;
+    if (!target.startsWith('http')) {
+      target = 'https://' + target;
     }
+    
+    // Update active state
+    setActiveChannelId(siteConfig.id);
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+        await chrome.storage.local.set({ webTvChannelId: siteConfig.id });
+    } else {
+        localStorage.setItem('webTvChannelId', siteConfig.id);
+    }
+
     if (typeof chrome !== 'undefined' && chrome.tabs && chrome.storage) {
       try {
         const result = await chrome.storage.local.get('webTvTabId');
@@ -174,42 +189,17 @@ const App = () => {
   };
 
   return (
-    <div style={{ padding: '16px' }}>
-      <header
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginBottom: '16px',
-        }}
-      >
-        <h1 style={{ fontSize: '18px', margin: 0 }}>Web TV Manager</h1>
-        <div style={{ display: 'flex', gap: '8px' }}>
+    <div>
+      <header className="header">
+        <h1>Web TV Manager</h1>
+        <div className="icon-btn-group">
           {activeTab === 'list' && (
             <>
-              <button
-                onClick={handleImportClick}
-                title="Import JSON"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#aaa',
-                  cursor: 'pointer',
-                }}
-              >
-                <Upload size={20} />
+              <button onClick={handleImportClick} title="Import JSON">
+                <Upload size={16} />
               </button>
-              <button
-                onClick={handleExport}
-                title="Export JSON"
-                style={{
-                  background: 'none',
-                  border: 'none',
-                  color: '#aaa',
-                  cursor: 'pointer',
-                }}
-              >
-                <Download size={20} />
+              <button onClick={handleExport} title="Export JSON">
+                <Download size={16} />
               </button>
               <input
                 type="file"
@@ -222,87 +212,56 @@ const App = () => {
           )}
           <button
             onClick={() => setActiveTab(activeTab === 'list' ? 'add' : 'list')}
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#646cff',
-              cursor: 'pointer',
-            }}
+            title={activeTab === 'list' ? 'Add Site' : 'Cancel'}
           >
-            {activeTab === 'list' ? <Plus size={20} /> : 'Cancel'}
+            {activeTab === 'list' ? <Plus size={18} /> : 'Cancel'}
           </button>
         </div>
       </header>
 
       {activeTab === 'add' ? (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="add-form">
           <input
+            type="text"
             placeholder="Name (e.g. YouTube)"
             value={newSite.name || ''}
             onChange={(e) => setNewSite({ ...newSite, name: e.target.value })}
           />
           <input
+            type="text"
             placeholder="URL Pattern (e.g. youtube.com)"
             value={newSite.urlPattern || ''}
             onChange={(e) =>
               setNewSite({ ...newSite, urlPattern: e.target.value })
             }
           />
-          <div style={{ fontSize: '12px', color: '#888' }}>
-            URL supports partial match.
-          </div>
+          <div className="helper-text">URL supports partial match.</div>
           <input
+            type="text"
             placeholder="CSS Selector (e.g. video, .player)"
             value={newSite.cssSelector || ''}
             onChange={(e) =>
               setNewSite({ ...newSite, cssSelector: e.target.value })
             }
           />
-          <div style={{ fontSize: '12px', color: '#888' }}>
+          <div className="helper-text">
             This element will be forced to fullscreen.
           </div>
-          <button
-            onClick={handleAdd}
-            style={{
-              background: '#646cff',
-              color: 'white',
-              border: 'none',
-              padding: '8px',
-              borderRadius: '4px',
-              marginTop: '8px',
-              cursor: 'pointer',
-            }}
-          >
+          <button onClick={handleAdd} className="primary-btn">
             Add Site
           </button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <div className="channel-list">
           {sites.map((site) => (
             <div
               key={site.id}
-              onClick={() => handleOpen(site.urlPattern)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                background: '#2a2a2a',
-                padding: '8px',
-                borderRadius: '4px',
-                gap: '8px',
-                cursor: 'pointer',
-              }}
+              onClick={() => handleOpen(site)}
+              className={`channel-item ${site.id === activeChannelId ? 'selected' : ''}`}
             >
-              <div style={{ flex: 1, overflow: 'hidden' }}>
-                <div style={{ fontWeight: 'bold' }}>{site.name}</div>
-                <div
-                  style={{
-                    fontSize: '12px',
-                    color: '#888',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                  }}
-                >
+              <div className="channel-info">
+                <div className="channel-name">{site.name}</div>
+                <div className="channel-url">
                   {site.urlPattern}
                 </div>
               </div>
@@ -311,22 +270,15 @@ const App = () => {
                   e.stopPropagation();
                   handleDelete(site.id);
                 }}
+                className="icon-btn delete-btn"
                 title="Delete"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#ff4444',
-                  cursor: 'pointer',
-                }}
               >
                 <Trash2 size={16} />
               </button>
             </div>
           ))}
           {sites.length === 0 && (
-            <div
-              style={{ color: '#888', textAlign: 'center', padding: '16px' }}
-            >
+            <div className="empty-state">
               No sites configured. Click + to add one.
             </div>
           )}
