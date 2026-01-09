@@ -9,7 +9,7 @@ export default defineConfig({
     emptyOutDir: true,
     rollupOptions: {
       input: {
-        popup: resolve(__dirname, 'src/popup/index.html'),
+        sidepanel: resolve(__dirname, 'src/sidepanel/index.html'),
         content: resolve(__dirname, 'src/content.ts'),
         background: resolve(__dirname, 'src/background.ts'),
       },
@@ -18,7 +18,7 @@ export default defineConfig({
           return '[name].js';
         },
         assetFileNames: 'assets/[name].[ext]', // Remove hash for simplicity in manifest reference if needed, but hash is better for caching. However, for extension, we need stable names for content scripts.
-      }
-    }
-  }
+      },
+    },
+  },
 });
