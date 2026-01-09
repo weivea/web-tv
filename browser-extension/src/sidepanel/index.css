@@ -123,10 +123,10 @@ button:hover {
 }
 
 .channel-item.selected {
-  background-color: rgba(100, 108, 255, 0.15);
-  border-left: 3px solid #646cff;
-  color: #fff;
-  font-weight: 500;
+  background-color: rgba(100, 108, 255, 0.25) !important;
+  border-left: 4px solid #646cff !important;
+  color: #fff !important;
+  box-shadow: inset 0 0 20px rgba(100, 108, 255, 0.1);
 }
 
 .channel-info {

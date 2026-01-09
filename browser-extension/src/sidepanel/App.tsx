@@ -20,20 +20,12 @@ const App = () => {
     loadSites();
   }, []);
 
-  const loadSites = async () => {
-    if (typeof chrome !== 'undefined' && chrome.storage) {
-      const result = await chrome.storage.local.get(['webTvSites', 'webTvChannelId']);
-      if (result.webTvSites) {
-        setSites(result.webTvSites);
-      }
-      if (result.webTvChannelId) {
-        setActiveChannelId(result.webTvChannelId);
-      }
-    } else {
-      const saved = localStorage.getItem('webTvSites');
-      if (saved) setSites(JSON.parse(saved));
-      const savedId = localStorage.getItem('webTvChannelId');
-      if (savedId) setActiveChannelId(savedId);
+  const calculateId = (url: string) => {
+    try {
+      if (!url) return Math.random().toString(36).substring(7);
+      return btoa(url).replace(/=/g, '').substring(0, 10);
+    } catch {
+      return Math.random().toString(36).substring(7);
     }
   };
 
@@ -46,11 +38,57 @@ const App = () => {
     }
   };
 
-  const calculateId = (url: string) => {
-    try {
-      return btoa(url).replace(/=/g, '').substring(0, 10);
-    } catch {
-      return Math.random().toString(36).substring(7);
+  const loadSites = async () => {
+    let loadedSites: WebSiteConfig[] = [];
+    if (typeof chrome !== 'undefined' && chrome.storage) {
+      const result = await chrome.storage.local.get([
+        'webTvSites',
+        'webTvChannelId',
+      ]);
+      if (result.webTvSites) {
+        loadedSites = result.webTvSites;
+      }
+      if (result.webTvChannelId) {
+        setActiveChannelId(result.webTvChannelId);
+      }
+    } else {
+      const saved = localStorage.getItem('webTvSites');
+      if (saved) loadedSites = JSON.parse(saved);
+      const savedId = localStorage.getItem('webTvChannelId');
+      if (savedId) setActiveChannelId(savedId);
+    }
+
+    // Migration/Fix: Ensure all sites have unique IDs
+    let hasChanges = false;
+    const seenIds = new Set<string>();
+    
+    const sanitized = loadedSites.map((site) => {
+      let currentId = site.id;
+      
+      // Generate ID if missing OR if duplicate
+      if (!currentId || seenIds.has(currentId)) {
+        hasChanges = true;
+        // Try generating from URL first
+        const base = site.urlPattern || site.url || Math.random().toString();
+        currentId = calculateId(base);
+        
+        // If still duplicate (same URL?), append random
+        if (seenIds.has(currentId)) {
+             currentId = currentId + '_' + Math.random().toString(36).substring(7);
+        }
+      }
+      
+      seenIds.add(currentId);
+      
+      if (currentId !== site.id) {
+          return { ...site, id: currentId };
+      }
+      return site;
+    });
+
+    setSites(sanitized);
+    if (hasChanges) {
+      saveSites(sanitized);
     }
   };
 
