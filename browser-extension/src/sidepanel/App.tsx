@@ -71,15 +71,40 @@ const App = () => {
     await saveSites(updated);
   };
 
-  const handleOpen = (url: string) => {
+  const handleOpen = async (url: string) => {
     let target = url;
     if (!url.startsWith('http')) {
       target = 'https://' + url;
     }
-    if (typeof chrome !== 'undefined' && chrome.tabs) {
-      chrome.tabs.create({ url: target });
+    if (typeof chrome !== 'undefined' && chrome.tabs && chrome.storage) {
+      try {
+        const result = await chrome.storage.local.get('webTvTabId');
+        const existingTabId = result.webTvTabId;
+
+        if (existingTabId) {
+          try {
+            await chrome.tabs.get(existingTabId);
+            await chrome.tabs.update(existingTabId, { url: target, active: true });
+            // Attempt to focus the window as well
+            const tab = await chrome.tabs.get(existingTabId);
+            if (tab.windowId) {
+                await chrome.windows.update(tab.windowId, { focused: true });
+            }
+            return;
+          } catch (e) {
+            // Tab no longer exists, create new one
+          }
+        }
+        
+        const tab = await chrome.tabs.create({ url: target });
+        if (tab.id) {
+          await chrome.storage.local.set({ webTvTabId: tab.id });
+        }
+      } catch (error) {
+        console.error('Failed to open tab', error);
+      }
     } else {
-      window.open(target, '_blank');
+      window.open(target, 'web-tv-player');
     }
   };
 
