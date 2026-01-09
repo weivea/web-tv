@@ -6,7 +6,13 @@
   "permissions": ["storage", "scripting", "sidePanel"],
   "host_permissions": ["<all_urls>"],
   "action": {
-    "default_title": "Web TV Helper"
+    "default_title": "Web TV Helper",
+    "default_icon": "icon.png"
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
   },
   "side_panel": {
     "default_path": "src/sidepanel/index.html"
