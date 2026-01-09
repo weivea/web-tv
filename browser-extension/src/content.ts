@@ -8,7 +8,7 @@ interface WebSiteConfig {
 const initialize = async () => {
   try {
     // Wait for storage
-    const result = await chrome.storage.sync.get('webTvSites');
+    const result = await chrome.storage.local.get('webTvSites');
     const sites: WebSiteConfig[] = result.webTvSites || [];
     
     const currentUrl = window.location.href;
