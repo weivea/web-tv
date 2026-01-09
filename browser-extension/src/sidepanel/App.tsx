@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { Trash2, Plus, ExternalLink, Upload, Download } from 'lucide-react';
+import { Trash2, Plus, Upload, Download } from 'lucide-react';
 
 interface WebSiteConfig {
   id: string;
@@ -256,6 +256,7 @@ const App = () => {
           {sites.map((site) => (
             <div
               key={site.id}
+              onClick={() => handleOpen(site.urlPattern)}
               style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -263,6 +264,7 @@ const App = () => {
                 padding: '8px',
                 borderRadius: '4px',
                 gap: '8px',
+                cursor: 'pointer',
               }}
             >
               <div style={{ flex: 1, overflow: 'hidden' }}>
@@ -280,19 +282,10 @@ const App = () => {
                 </div>
               </div>
               <button
-                onClick={() => handleOpen(site.urlPattern)}
-                title="Open"
-                style={{
-                  background: 'transparent',
-                  border: 'none',
-                  color: '#aaa',
-                  cursor: 'pointer',
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleDelete(site.id);
                 }}
-              >
-                <ExternalLink size={16} />
-              </button>
-              <button
-                onClick={() => handleDelete(site.id)}
                 title="Delete"
                 style={{
                   background: 'transparent',
