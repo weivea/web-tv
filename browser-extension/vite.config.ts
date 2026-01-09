@@ -1,0 +1,24 @@
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { resolve } from 'path';
+
+export default defineConfig({
+  plugins: [react()],
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    rollupOptions: {
+      input: {
+        popup: resolve(__dirname, 'src/popup/index.html'),
+        content: resolve(__dirname, 'src/content.ts'),
+        background: resolve(__dirname, 'src/background.ts'),
+      },
+      output: {
+        entryFileNames: (chunkInfo) => {
+          return '[name].js';
+        },
+        assetFileNames: 'assets/[name].[ext]', // Remove hash for simplicity in manifest reference if needed, but hash is better for caching. However, for extension, we need stable names for content scripts.
+      }
+    }
+  }
+});

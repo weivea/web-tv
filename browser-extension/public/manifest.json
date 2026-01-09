@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Web TV Helper",
+  "version": "1.0.0",
+  "description": "Helper extension for Web TV to enable fullscreen and autoplay",
+  "permissions": [
+    "storage",
+    "scripting"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "src/popup/index.html",
+    "default_title": "Web TV Helper"
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+        "resources": ["assets/*"],
+        "matches": ["<all_urls>"]
+    }
+  ]
+}
